@@ -40,7 +40,7 @@ public class GameState : MonoBehaviour
 
         DontDestroyOnLoad(gameObject);
 
-        EnterState(State.MainMenu);
+        //EnterState(State.MainMenu);
     }
 
     void Update()
@@ -71,7 +71,7 @@ public class GameState : MonoBehaviour
     {
         EnterState(State.GameOver);
     }
-
+    
     public void EnterMainGame()
     {
         EnterState(State.Tutorial);
@@ -80,6 +80,11 @@ public class GameState : MonoBehaviour
     public void BeginPlay()
     {
         EnterState(State.Playing);
+    }
+
+    public void ExitPlay()
+    {
+        EnterState(State.MainMenu);
     }
 
     #endregion
@@ -98,6 +103,7 @@ public class GameState : MonoBehaviour
         switch (EntryState)
         {
             case State.MainMenu:
+                SceneManager.LoadScene(MainMenuSceneName);
                 break;
             case State.Tutorial:
                 SceneManager.LoadScene(GameSceneName);
@@ -147,6 +153,17 @@ public class GameState : MonoBehaviour
         Debug.Log("Updating state " + mState + "...");
         switch (mState)
         {
+            case State.Default:
+                string SceneName = SceneManager.GetActiveScene().name;
+                if (SceneName == MainMenuSceneName)
+                {
+                    EnterState(State.MainMenu);
+                }
+                else if(SceneName == GameSceneName)
+                {
+                    EnterState(State.Tutorial);
+                }
+                break;
             case State.MainMenu:
                 break;
             case State.Tutorial:
@@ -160,6 +177,7 @@ public class GameState : MonoBehaviour
             case State.GameOver:
                 break;
             default:
+                
                 break;
         }
     } 
