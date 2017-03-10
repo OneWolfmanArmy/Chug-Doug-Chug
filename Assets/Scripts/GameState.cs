@@ -39,8 +39,6 @@ public class GameState : MonoBehaviour
         }
 
         DontDestroyOnLoad(gameObject);
-
-        //EnterState(State.MainMenu);
     }
 
     void Update()
@@ -106,13 +104,13 @@ public class GameState : MonoBehaviour
                 SceneManager.LoadScene(MainMenuSceneName);
                 break;
             case State.Tutorial:
-                SceneManager.LoadScene(GameSceneName);
+                SceneManager.LoadScene(GameSceneName);             
                 break;
             case State.Playing:
-                CPManager = GameObject.Find("ControlPoints").GetComponent<ControlPointManager>();
-                CPManager.Enable();
+                CPManager.SetActive(true);
                 break;
             case State.Paused:
+                Time.timeScale = 0;
                 break;
             case State.InGameMenu:
                 break;
@@ -134,10 +132,13 @@ public class GameState : MonoBehaviour
             case State.MainMenu:
                 break;
             case State.Tutorial:
+                CPManager = GameObject.Find("ControlPoints").GetComponent<ControlPointManager>();
                 break;
             case State.Playing:
+                CPManager.SetActive(false);
                 break;
             case State.Paused:
+                Time.timeScale = 1;
                 break;
             case State.InGameMenu:
                 break;

@@ -21,12 +21,13 @@ public class ControlPoint : MonoBehaviour
     private Rigidbody2D mRigidbody2D;
     private SpriteRenderer mSpriteRenderer;
 
+    private bool bActive;
     private bool bDrifting;
     private bool bDragging;
     
     private float mDriftForce;
 
-    private System.Action UpdateManager;
+    private System.Action UpdateControlPointManager;
 
     #endregion
 
@@ -54,17 +55,20 @@ public class ControlPoint : MonoBehaviour
 
     void OnMouseOver()
     {
-        if(Input.GetMouseButtonDown(0))
+        if (bActive)
         {
-            OnSelect();
-        }
-        else if(Input.GetMouseButton(0))
-        {
-            OnMouseMove();
-        }
-        else if(Input.GetMouseButtonUp(0))
-        {
-            OnRelease();
+            if (Input.GetMouseButtonDown(0))
+            {
+                OnSelect();
+            }
+            else if (Input.GetMouseButton(0))
+            {
+                OnMouseMove();
+            }
+            else if (Input.GetMouseButtonUp(0))
+            {
+                OnRelease();
+            }
         }
     }
 
@@ -77,9 +81,14 @@ public class ControlPoint : MonoBehaviour
 
     #region Public Class Methods
 
+    public void SetActive(bool bActivate)
+    {
+        bActive = bActivate;
+    }
+
     public void Destabilize(System.Action Callback, float Delay)
     {
-        UpdateManager = Callback;
+        UpdateControlPointManager = Callback;
         Invoke("OnDriftEnter", Delay);
     }
 
@@ -113,7 +122,7 @@ public class ControlPoint : MonoBehaviour
         bDragging = false;
         mSpriteRenderer.color = Color.white;
         mRigidbody2D.velocity = Vector2.zero;
-        UpdateManager();
+        UpdateControlPointManager();
         ResetNode();       
     }
 
@@ -131,7 +140,7 @@ public class ControlPoint : MonoBehaviour
         if(bDragging)
         {
             // mRigidbody2D.gravityScale = 0;
-            Vector2 Delta= new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
+            Vector2 Delta = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
             mRigidbody2D.velocity = Delta * DragSpeed;
         }
     }
@@ -143,14 +152,10 @@ public class ControlPoint : MonoBehaviour
             OnDragExit();        
         }
     }  
-    
-    private bool IsOnTarget()
-    {
-        return false;// Vector2.SqrMagnitude(Node.position - Target.position) <= mNodeRadiusSqr;
-    } 
 
     private void ResetNode()
     {
+        bActive = true;
         bDrifting = false;
         bDragging = false;
         mRigidbody2D.velocity = Vector2.zero;

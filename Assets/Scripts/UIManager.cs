@@ -12,6 +12,11 @@ public class UIManager : MonoBehaviour
         GameState.Instance.ExitPlay();
     }
 
+    public void PauseButton()
+    {
+        GameState.Instance.Pause();
+    }
+
     public void UpdateScore(int Points)
     {
         Score.text = Points.ToString();
