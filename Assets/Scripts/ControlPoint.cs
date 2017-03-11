@@ -12,8 +12,6 @@ public class ControlPoint : MonoBehaviour
     public float DragSpeed;
     public float MinGravity;
     public float MaxGravity;
-    public float MinStableDuration;
-    public float MaxStableDuration;
 
     #endregion
 
@@ -23,13 +21,13 @@ public class ControlPoint : MonoBehaviour
     private Rigidbody2D mRigidbody2D;
     private SpriteRenderer mSpriteRenderer;
 
+    private bool bActive;
     private bool bDrifting;
     private bool bDragging;
-
-    private float mNodeRadiusSqr;
     
     private float mDriftForce;
 
+    private System.Action UpdateControlPointManager;
 
     #endregion
 
@@ -42,7 +40,6 @@ public class ControlPoint : MonoBehaviour
         mRigidbody2D = GetComponent<Rigidbody2D>();
         mSpriteRenderer = GetComponent<SpriteRenderer>();
 
-        mNodeRadiusSqr = NodeRadius * NodeRadius;
         Target.transform.position = Node.position;
 
         ResetNode();
@@ -58,17 +55,20 @@ public class ControlPoint : MonoBehaviour
 
     void OnMouseOver()
     {
-        if(Input.GetMouseButtonDown(0))
+        if (bActive)
         {
-            OnSelect();
-        }
-        else if(Input.GetMouseButton(0))
-        {
-            OnMouseMove();
-        }
-        else if(Input.GetMouseButtonUp(0))
-        {
-            OnRelease();
+            if (Input.GetMouseButtonDown(0))
+            {
+                OnSelect();
+            }
+            else if (Input.GetMouseButton(0))
+            {
+                OnMouseMove();
+            }
+            else if (Input.GetMouseButtonUp(0))
+            {
+                OnRelease();
+            }
         }
     }
 
@@ -81,12 +81,19 @@ public class ControlPoint : MonoBehaviour
 
     #region Public Class Methods
 
-    public void Destabilize()
+    public void SetActive(bool bActivate)
     {
-        OnDriftEnter();
+        bActive = bActivate;
+    }
+
+    public void Destabilize(System.Action Callback, float Delay)
+    {
+        UpdateControlPointManager = Callback;
+        Invoke("OnDriftEnter", Delay);
     }
 
     #endregion
+
 
     #region Private Class Methods
 
@@ -108,7 +115,6 @@ public class ControlPoint : MonoBehaviour
     {
         bDragging = true;
         mSpriteRenderer.color = Color.blue;
-
     }
 
     private void OnDragExit()
@@ -116,9 +122,8 @@ public class ControlPoint : MonoBehaviour
         bDragging = false;
         mSpriteRenderer.color = Color.white;
         mRigidbody2D.velocity = Vector2.zero;
-       
-        ResetNode();
-       
+        UpdateControlPointManager();
+        ResetNode();       
     }
 
     private void OnSelect()
@@ -126,8 +131,7 @@ public class ControlPoint : MonoBehaviour
         if (bDrifting)
         {
             OnDriftExit();
-            OnDragEnter();
-            
+            OnDragEnter();            
         }
     }
 
@@ -136,9 +140,8 @@ public class ControlPoint : MonoBehaviour
         if(bDragging)
         {
             // mRigidbody2D.gravityScale = 0;
-            Vector2 Delta= new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
+            Vector2 Delta = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
             mRigidbody2D.velocity = Delta * DragSpeed;
-            Debug.Log(mRigidbody2D.velocity);  
         }
     }
 
@@ -149,21 +152,15 @@ public class ControlPoint : MonoBehaviour
             OnDragExit();        
         }
     }  
-    
-    private bool IsOnTarget()
-    {
-        return false;// Vector2.SqrMagnitude(Node.position - Target.position) <= mNodeRadiusSqr;
-    } 
 
     private void ResetNode()
     {
+        bActive = true;
         bDrifting = false;
         bDragging = false;
         mRigidbody2D.velocity = Vector2.zero;
         mRigidbody2D.angularVelocity = 0;
         mRigidbody2D.gravityScale = 0;
-        float StableDuration = Random.Range(MinStableDuration, MaxStableDuration);
-       // Invoke("OnDriftEnter", StableDuration);
     }
 
     #endregion
