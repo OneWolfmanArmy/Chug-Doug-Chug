@@ -170,6 +170,7 @@ public class GameState : MonoBehaviour
             case State.Tutorial:
                 break;
             case State.Playing:
+                CPManager.Update();
                 break;
             case State.Paused:
                 break;

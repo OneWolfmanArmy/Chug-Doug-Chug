@@ -37,9 +37,9 @@ public class ControlPointManager : MonoBehaviour
         IncreaseDifficulty();
     }
 
-    void Update()
+    public void Update()
     {
-        if (bActive && mDriftingCP.Count < mDifficulty.MaxDriftCount)
+        if (mDriftingCP.Count < mDifficulty.MaxDriftCount)
         {
             SelectNextDrifter();
         }

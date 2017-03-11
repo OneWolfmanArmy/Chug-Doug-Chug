@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Doug : MonoBehaviour
 {
-    public ScoreManager Score;
+    public ScoreManager ScoreBoard;
 
     private bool bDrinking;
 
@@ -17,7 +17,7 @@ public class Doug : MonoBehaviour
     {
         if(bDrinking)
         {
-            Score.IncrementIntoxication();
+            ScoreBoard.IncrementIntoxication();
         }
     }
 

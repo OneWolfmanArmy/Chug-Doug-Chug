@@ -6,6 +6,7 @@ public class ScoreManager : MonoBehaviour
 {
     public UIManager ScoreUI;
 
+    public float DrinkMultiplier;
     public float IntoxicationRate;
     public float StreetCredRate;
 
@@ -25,7 +26,7 @@ public class ScoreManager : MonoBehaviour
     {
         ScoreUI.UpdateIntoxicationBar(mIntoxication);
         ScoreUI.UpdateStreetCredBar(mStreetCred);
-        ScoreUI.UpdateScore(mScore);
+        ScoreUI.UpdateScoreText(mScore);
     }
 
     public void IncrementScore(int Points)
