@@ -17,9 +17,9 @@ public class UIManager : MonoBehaviour
         GameState.Instance.Pause();
     }
 
-    public void UpdateScore(int Points)
+    public void UpdateScoreText(int Points)
     {
-        Score.text = Points.ToString();
+        Score.text = (int.Parse(Score.text) + Points).ToString();
     }
 
     public void UpdateIntoxicationBar(float Intoxication)
