@@ -39,7 +39,7 @@ public class ControlPointManager : MonoBehaviour
 
     public void Update()
     {
-        if (mDriftingCP.Count < mDifficulty.MaxDriftCount)
+        if (bActive && mDriftingCP.Count < mDifficulty.MaxDriftCount)
         {
             SelectNextDrifter();
         }

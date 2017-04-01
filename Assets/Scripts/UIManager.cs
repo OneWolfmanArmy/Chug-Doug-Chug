@@ -5,7 +5,7 @@ public class UIManager : MonoBehaviour
 {
     public Text Score;
     public ProgressBar IntoxicationBar;
-    public ProgressBar StreetCredBar;
+    public ProgressBar StreetCredBar;    
 
     public void ExitButton()
     {
@@ -15,6 +15,13 @@ public class UIManager : MonoBehaviour
     public void PauseButton()
     {
         GameState.Instance.Pause();
+    }
+
+    public void InitScoreUI(int StartScore, float StartIntoxication, float StartStreetCred)
+    {
+        Score.text = StartScore.ToString();
+        IntoxicationBar.ResizeFilling(StartIntoxication);
+        StreetCredBar.ResizeFilling(StartStreetCred);
     }
 
     public void UpdateScoreText(int Points)

@@ -19,7 +19,7 @@ public class ScoreManager : MonoBehaviour
         mScore = 0;
         mIntoxication = 0.0f;        
         mStreetCred = .5f;
-        UpdateAllUI();
+        ScoreUI.InitScoreUI(mScore, mIntoxication, mStreetCred);
     }
 
     private void UpdateAllUI()
