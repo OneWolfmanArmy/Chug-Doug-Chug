@@ -24,8 +24,6 @@ public class ControlPoint : MonoBehaviour
     private bool bActive;
     private bool bDrifting;
     private bool bDragging;
-    
-    private float mDriftForce;
 
     private System.Action UpdateControlPointManager;
 

@@ -21,23 +21,23 @@ public class ControlPointManager : MonoBehaviour
     private List<ControlPoint> mStableCP;
     private List<ControlPoint> mDriftingCP;
 
-    public void SetActive(bool bActivate)
+    public void SetActive(bool Active)
     {
-        bActive = bActivate;
+        bActive = Active;
         for (int i = 0; i < ControlPoints.Length; i++)
         {
-            ControlPoints[i].SetActive(bActivate);
+            ControlPoints[i].SetActive(Active);
         }
     }
 
-    void Start()
+    public void Init()
     {
         mStableCP = new List<ControlPoint>(ControlPoints);
         mDriftingCP = new List<ControlPoint>(ControlPoints.Length);
         IncreaseDifficulty();
     }
 
-    public void Update()
+    public void OnFrame()
     {
         if (bActive && mDriftingCP.Count < mDifficulty.MaxDriftCount)
         {

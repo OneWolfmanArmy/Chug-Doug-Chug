@@ -8,7 +8,6 @@ public class GameState : MonoBehaviour
 
     #region Editor
 
-    public ControlPointManager CPManager;
 
     #endregion
 
@@ -21,6 +20,8 @@ public class GameState : MonoBehaviour
     private enum State {Default, MainMenu, Tutorial, Playing, Paused, InGameMenu, GameOver};
     private State mState;
     private bool bCanUpdate = false;
+    
+    private Doug mDoug;
 
     #endregion
 
@@ -43,7 +44,7 @@ public class GameState : MonoBehaviour
 
     void Update()
     {
-        if (bCanUpdate)
+        if (bCanUpdate || mState == State.Default)
         {
             ProcessCurrentState();
         }
@@ -107,7 +108,7 @@ public class GameState : MonoBehaviour
                 SceneManager.LoadScene(GameSceneName);             
                 break;
             case State.Playing:
-                CPManager.SetActive(true);
+                mDoug.SetActive(true);
                 break;
             case State.Paused:
                 Time.timeScale = 0;
@@ -132,10 +133,11 @@ public class GameState : MonoBehaviour
             case State.MainMenu:
                 break;
             case State.Tutorial:
-                CPManager = GameObject.Find("ControlPoints").GetComponent<ControlPointManager>();
+                mDoug = GameObject.Find("Doug").GetComponent<Doug>();
+                mDoug.Init();
                 break;
             case State.Playing:
-                CPManager.SetActive(false);
+                mDoug.SetActive(false);
                 break;
             case State.Paused:
                 Time.timeScale = 1;
@@ -170,7 +172,7 @@ public class GameState : MonoBehaviour
             case State.Tutorial:
                 break;
             case State.Playing:
-                CPManager.Update();
+                mDoug.OnFrame();
                 break;
             case State.Paused:
                 break;

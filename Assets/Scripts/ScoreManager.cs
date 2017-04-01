@@ -9,12 +9,15 @@ public class ScoreManager : MonoBehaviour
     public float DrinkMultiplier;
     public float IntoxicationRate;
     public float StreetCredRate;
+       
+    private const float FATAL_INTOXICATION = 1.0f;
+    private const float FATAL_STREETCRED = 0.0f;
 
     private int mScore;
     private float mIntoxication;
     private float mStreetCred;
 
-    void Start()
+    public void Init()
     {
         mScore = 0;
         mIntoxication = 0.0f;        
@@ -37,12 +40,15 @@ public class ScoreManager : MonoBehaviour
     public void IncrementIntoxication()
     {
         mIntoxication += IntoxicationRate * Time.deltaTime;
-        if(mIntoxication >= 1)
+        if (mIntoxication >= FATAL_INTOXICATION)
         {
+            ScoreUI.UpdateIntoxicationBar(FATAL_INTOXICATION);
             GameState.Instance.GameOver();
         }
-
-        ScoreUI.UpdateIntoxicationBar(mIntoxication);
+        else
+        {
+            ScoreUI.UpdateIntoxicationBar(mIntoxication);
+        }
     }
 
     public void IncrementStreetCred()
@@ -58,9 +64,14 @@ public class ScoreManager : MonoBehaviour
     public void DecrementStreetCred()
     {
         mStreetCred -= StreetCredRate * Time.deltaTime;
-        if(mStreetCred <= 0.0f)
+        if(mStreetCred <= FATAL_STREETCRED)
         {
+            ScoreUI.UpdateIntoxicationBar(FATAL_STREETCRED);
             GameState.Instance.GameOver();
         }
+        else
+        {
+            ScoreUI.UpdateIntoxicationBar(mStreetCred);
+        }   
     }
 }
