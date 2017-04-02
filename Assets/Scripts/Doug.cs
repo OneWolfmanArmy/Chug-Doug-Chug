@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Doug : MonoBehaviour
 {
+    public UIManager UI;
     public ScoreManager ScoreBoard;
     public ControlPointManager CPManager;
 
@@ -12,6 +13,7 @@ public class Doug : MonoBehaviour
 
     public void Init()
     {
+        UI.Init();
         ScoreBoard.Init();
         CPManager.Init();
 

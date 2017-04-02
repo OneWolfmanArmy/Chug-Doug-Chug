@@ -3,22 +3,16 @@ using UnityEngine.UI;
 
 public class ProgressBar : MonoBehaviour
 {
-    private Image mFrame;
-    private Image mFilling;
-
-    void Awake()
-    {
-        mFrame = transform.GetChild(0).GetComponent<Image>();
-        mFilling = transform.GetChild(1).GetComponent<Image>();
-    }
+    public Image Frame;
+    public Image Filling;
 
     public void ResizeFilling(float Ratio)
     {
-        if(mFrame == null || mFilling == null)
+        if(Frame == null || Filling == null)
         {
             return;
         }
 
-        mFilling.rectTransform.sizeDelta = Vector2.Scale(mFrame.rectTransform.sizeDelta, new Vector2(Ratio, 1.0f));
+        Filling.rectTransform.localScale = new Vector2(1.0f, Ratio);
     }
 }

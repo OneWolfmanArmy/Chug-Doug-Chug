@@ -5,16 +5,25 @@ public class UIManager : MonoBehaviour
 {
     public Text Score;
     public ProgressBar IntoxicationBar;
-    public ProgressBar StreetCredBar;    
+    public ProgressBar StreetCredBar;
 
-    public void ExitButton()
+    public Button PauseButton;
+    public Button ExitButton;  
+
+    public void OnExitButtonPressed()
     {
         GameState.Instance.ExitPlay();
     }
 
-    public void PauseButton()
+    public void OnPauseButtonPressed()
     {
         GameState.Instance.Pause();
+    }
+
+    public void Init()
+    {
+        PauseButton.gameObject.SetActive(true);
+        ExitButton.gameObject.SetActive(true);
     }
 
     public void InitScoreUI(int StartScore, float StartIntoxication, float StartStreetCred)

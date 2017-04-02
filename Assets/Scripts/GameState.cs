@@ -7,8 +7,7 @@ public class GameState : MonoBehaviour
     public static GameState Instance = null;
 
     #region Editor
-
-
+    
     #endregion
 
 
@@ -118,6 +117,7 @@ public class GameState : MonoBehaviour
             case State.GameOver:
                 break;
             default:
+
                 break;
         }
 
@@ -147,6 +147,7 @@ public class GameState : MonoBehaviour
             case State.GameOver:
                 break;
             default:
+
                 break;
         }
     }
@@ -156,17 +157,6 @@ public class GameState : MonoBehaviour
         Debug.Log("Updating state " + mState + "...");
         switch (mState)
         {
-            case State.Default:
-                string SceneName = SceneManager.GetActiveScene().name;
-                if (SceneName == MainMenuSceneName)
-                {
-                    EnterState(State.MainMenu);
-                }
-                else if(SceneName == GameSceneName)
-                {
-                    EnterState(State.Tutorial);
-                }
-                break;
             case State.MainMenu:
                 break;
             case State.Tutorial:
@@ -181,7 +171,15 @@ public class GameState : MonoBehaviour
             case State.GameOver:
                 break;
             default:
-                
+                string SceneName = SceneManager.GetActiveScene().name;
+                if (SceneName == MainMenuSceneName)
+                {
+                    EnterState(State.MainMenu);
+                }
+                else if (SceneName == GameSceneName)
+                {
+                    EnterState(State.Tutorial);
+                }
                 break;
         }
     } 
