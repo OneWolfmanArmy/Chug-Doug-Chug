@@ -5,7 +5,7 @@ public class UIManager : MonoBehaviour
 {
     public Text Score;
     public ProgressBar IntoxicationBar;
-    public ProgressBar StreetCredBar;
+    public ProgressBar CredBar;
 
     public Button PauseButton;
     public Button ExitButton;  
@@ -26,11 +26,11 @@ public class UIManager : MonoBehaviour
         ExitButton.gameObject.SetActive(true);
     }
 
-    public void InitScoreUI(int StartScore, float StartIntoxication, float StartStreetCred)
+    public void InitScoreUI(int StartScore, float StartIntoxication, float StartCred)
     {
         Score.text = StartScore.ToString();
         IntoxicationBar.ResizeFilling(StartIntoxication);
-        StreetCredBar.ResizeFilling(StartStreetCred);
+        CredBar.ResizeFilling(StartCred);
     }
 
     public void UpdateScoreText(int Points)
@@ -45,6 +45,6 @@ public class UIManager : MonoBehaviour
 
     public void UpdateStreetCredBar(float StreetCred)
     {
-        StreetCredBar.ResizeFilling(StreetCred);
+        CredBar.ResizeFilling(StreetCred);
     }
 }
