@@ -34,9 +34,14 @@ public class ControlPointManager : MonoBehaviour
     {
         mStableCP = new List<ControlPoint>(ControlPoints);
         mDriftingCP = new List<ControlPoint>(ControlPoints.Length);
-        IncreaseDifficulty();
+        mDifficulty = Difficulties[0];
+        mDifficultyLevel = 1;
+        for(int i = 0; i < ControlPoints.Length; i++)
+        {
+            ControlPoints[i].Init();
+        }
     }
-
+    
     public void OnFrame()
     {
         if (bActive && mDriftingCP.Count < mDifficulty.MaxDriftCount)
@@ -50,6 +55,15 @@ public class ControlPointManager : MonoBehaviour
         mDifficulty = Difficulties[mDifficultyLevel];
         mDifficultyLevel++;
     }
+
+    private void ResetControlNodes()
+    {
+        for (int i = 0; i < ControlPoints.Length; i++)
+        {
+            ControlPoints[i].ResetNode();
+        }
+    }
+
 
     private void SelectNextDrifter()
     {

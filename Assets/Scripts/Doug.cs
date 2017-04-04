@@ -7,13 +7,11 @@ public class Doug : MonoBehaviour
     public UIManager UI;
     public ScoreManager ScoreBoard;
     public ControlPointManager CPManager;
-
-    private bool bActive;
+    
     private bool bDrinking;
 
     public void Init()
     {
-        UI.Init();
         ScoreBoard.Init();
         CPManager.Init();
 

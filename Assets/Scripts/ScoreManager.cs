@@ -21,15 +21,12 @@ public class ScoreManager : MonoBehaviour
     {
         mScore = 0;
         mIntoxication = 0.0f;        
-        mStreetCred = .5f;
-        ScoreUI.InitScoreUI(mScore, mIntoxication, mStreetCred);
+        mStreetCred = .5f;        
     }
 
     private void UpdateAllUI()
     {
-        ScoreUI.UpdateIntoxicationBar(mIntoxication);
-        ScoreUI.UpdateStreetCredBar(mStreetCred);
-        ScoreUI.UpdateScoreText(mScore);
+        ScoreUI.SetScoreUI(mScore, mIntoxication, mStreetCred);
     }
 
     public void IncrementScore(int Points)
@@ -43,7 +40,7 @@ public class ScoreManager : MonoBehaviour
         if (mIntoxication >= FATAL_INTOXICATION)
         {
             ScoreUI.UpdateIntoxicationBar(FATAL_INTOXICATION);
-            GameState.Instance.GameOver();
+            FinalizeScore();
         }
         else
         {
@@ -67,11 +64,17 @@ public class ScoreManager : MonoBehaviour
         if(mStreetCred <= FATAL_STREETCRED)
         {
             ScoreUI.UpdateIntoxicationBar(FATAL_STREETCRED);
-            GameState.Instance.GameOver();
+            FinalizeScore();
         }
         else
         {
             ScoreUI.UpdateIntoxicationBar(mStreetCred);
         }   
+    }
+
+    public void FinalizeScore()
+    {
+        ScoreUI.DisplayFinalScore();
+        GameState.Instance.GameOver();
     }
 }

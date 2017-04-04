@@ -21,6 +21,7 @@ public class GameState : MonoBehaviour
     private bool bCanUpdate = false;
     
     private Doug mDoug;
+    private UIManager mUIManager;
 
     #endregion
 
@@ -104,7 +105,7 @@ public class GameState : MonoBehaviour
                 SceneManager.LoadScene(MainMenuSceneName);
                 break;
             case State.Tutorial:
-                SceneManager.LoadScene(GameSceneName);             
+                SceneManager.LoadScene(GameSceneName);
                 break;
             case State.Playing:
                 mDoug.SetActive(true);
@@ -115,6 +116,7 @@ public class GameState : MonoBehaviour
             case State.InGameMenu:
                 break;
             case State.GameOver:
+                mDoug.SetActive(false);
                 break;
             default:
 
@@ -133,8 +135,11 @@ public class GameState : MonoBehaviour
             case State.MainMenu:
                 break;
             case State.Tutorial:
+
                 mDoug = GameObject.Find("Doug").GetComponent<Doug>();
+                mUIManager = GameObject.Find("Canvas_UI").GetComponent<UIManager>();
                 mDoug.Init();
+                mUIManager.Init();
                 break;
             case State.Playing:
                 mDoug.SetActive(false);
@@ -145,6 +150,8 @@ public class GameState : MonoBehaviour
             case State.InGameMenu:
                 break;
             case State.GameOver:
+                mDoug.Init();
+                mUIManager.Init();
                 break;
             default:
 

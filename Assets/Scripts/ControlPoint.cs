@@ -21,6 +21,9 @@ public class ControlPoint : MonoBehaviour
     private Rigidbody2D mRigidbody2D;
     private SpriteRenderer mSpriteRenderer;
 
+    private Vector3 OriginalPos;
+    private Quaternion OriginalRot;
+
     private bool bActive;
     private bool bDrifting;
     private bool bDragging;
@@ -33,14 +36,14 @@ public class ControlPoint : MonoBehaviour
     #region MonoBehavior
 
     // Use this for initialization
-    void Start ()
+    void Start()
     {
         mRigidbody2D = GetComponent<Rigidbody2D>();
         mSpriteRenderer = GetComponent<SpriteRenderer>();
-
-        Target.transform.position = Node.position;
-
-        ResetNode();
+        //Target.transform.position = Node.transform.position;
+        OriginalPos = transform.position;
+        OriginalRot = transform.rotation;
+        // ResetNode();
     }
 
     void OnDrawGizmos()
@@ -78,6 +81,11 @@ public class ControlPoint : MonoBehaviour
     #endregion
 
     #region Public Class Methods
+
+    public void Init()
+    {
+        ResetNode();
+    }
 
     public void SetActive(bool bActivate)
     {
@@ -121,7 +129,7 @@ public class ControlPoint : MonoBehaviour
         mSpriteRenderer.color = Color.white;
         mRigidbody2D.velocity = Vector2.zero;
         UpdateControlPointManager();
-        ResetNode();       
+        //ResetNode();       
     }
 
     private void OnSelect()
@@ -151,8 +159,10 @@ public class ControlPoint : MonoBehaviour
         }
     }  
 
-    private void ResetNode()
+    public void ResetNode()
     {
+        transform.position = OriginalPos;
+        transform.rotation = OriginalRot;
         bActive = true;
         bDrifting = false;
         bDragging = false;
