@@ -1,16 +1,43 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-public class UIManager : MonoBehaviour
+public class UIManager : MonoBehaviour, IGameLoop
 {
+    #region Editor
+
+    public Canvas BGCanvas;
+    public Canvas UICanvas;
+    public Canvas FGCanvas;
+
     public Text ScoreText;
     public Tutorial TutorialDisplay;
-    public Transform FinalScoreDisplay;
+    public RectTransform PauseDisplay;
+    public RectTransform FinalScoreDisplay;
+    public RectTransform GameOverOverlay;
+
+    public Button PauseButton;
+    public Button ExitButton;
+
     public ProgressBar IntoxicationBar;
     public ProgressBar CredBar;
 
-    public Button PauseButton;
-    public Button ExitButton;  
+    #endregion
+
+
+    #region IGameLoop
+
+    public void OnGameBegin()
+    {
+        PauseButton.gameObject.SetActive(true);
+        ExitButton.gameObject.SetActive(true);
+    }
+
+    public void OnFrame() {}
+
+    #endregion
+
+
+    #region Button Callbacks
 
     public void OnExitButtonPressed()
     {
@@ -19,6 +46,17 @@ public class UIManager : MonoBehaviour
 
     public void OnPauseButtonPressed()
     {
+        FGCanvas.gameObject.SetActive(true);
+        UICanvas.gameObject.SetActive(false);
+        PauseDisplay.gameObject.SetActive(true);
+        GameState.Instance.Pause();
+    }
+
+    public void OnPauseOverlayPressed()
+    {
+        FGCanvas.gameObject.SetActive(false);
+        UICanvas.gameObject.SetActive(true);
+        PauseDisplay.gameObject.SetActive(false);
         GameState.Instance.Pause();
     }
 
@@ -30,16 +68,17 @@ public class UIManager : MonoBehaviour
     public void OnPlayAgainButtonPressed()
     {
         FinalScoreDisplay.gameObject.SetActive(false);
+        GameOverOverlay.gameObject.SetActive(false);
+        FGCanvas.gameObject.SetActive(false);
         GameState.Instance.BeginPlay();
     }
 
-    public void Init()
-    {
-        PauseButton.gameObject.SetActive(true);
-        ExitButton.gameObject.SetActive(true);
-    }
+    #endregion
 
-    public void SetScoreUI(int Score, float Intoxication, float Cred)
+
+    #region Metric Methods
+
+    public void SetScoreMetrics(int Score, float Intoxication, float Cred)
     {
         ScoreText.text = Score.ToString();
         IntoxicationBar.ResizeFilling(Intoxication);
@@ -61,9 +100,22 @@ public class UIManager : MonoBehaviour
         CredBar.ResizeFilling(StreetCred);
     }
 
+    #endregion
+
+
+    #region Events
+
     public void DisplayFinalScore()
     {
         ScoreText.text = "GAME OVER";
+        IntoxicationBar.gameObject.SetActive(false);
+        CredBar.gameObject.SetActive(false);
+        PauseButton.gameObject.SetActive(false);
+        ExitButton.gameObject.SetActive(false);
         FinalScoreDisplay.gameObject.SetActive(true);
+        FGCanvas.gameObject.SetActive(true);
+        GameOverOverlay.gameObject.SetActive(true);
     }
+
+    #endregion
 }

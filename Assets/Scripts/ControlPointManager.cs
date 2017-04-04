@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class ControlPointManager : MonoBehaviour
+public class ControlPointManager : MonoBehaviour, IGameLoop
 {
     [System.Serializable]
     public struct Difficulty
@@ -13,24 +13,14 @@ public class ControlPointManager : MonoBehaviour
     public Difficulty[] Difficulties;
 
     public ControlPoint[] ControlPoints;
-
-    private bool bActive;
+    
     private int mDifficultyLevel;
     private Difficulty mDifficulty;
 
     private List<ControlPoint> mStableCP;
     private List<ControlPoint> mDriftingCP;
-
-    public void SetActive(bool Active)
-    {
-        bActive = Active;
-        for (int i = 0; i < ControlPoints.Length; i++)
-        {
-            ControlPoints[i].SetActive(Active);
-        }
-    }
-
-    public void Init()
+    
+    public void OnGameBegin()
     {
         mStableCP = new List<ControlPoint>(ControlPoints);
         mDriftingCP = new List<ControlPoint>(ControlPoints.Length);
@@ -44,7 +34,7 @@ public class ControlPointManager : MonoBehaviour
     
     public void OnFrame()
     {
-        if (bActive && mDriftingCP.Count < mDifficulty.MaxDriftCount)
+        if (mDriftingCP.Count < mDifficulty.MaxDriftCount)
         {
             SelectNextDrifter();
         }

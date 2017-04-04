@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ScoreManager : MonoBehaviour
+public class ScoreManager : MonoBehaviour, IGameLoop
 {
+    #region Editor
+
     public UIManager ScoreUI;
 
     public float DrinkMultiplier;
@@ -17,17 +19,26 @@ public class ScoreManager : MonoBehaviour
     private float mIntoxication;
     private float mStreetCred;
 
-    public void Init()
+    #endregion
+
+
+    #region IGameLoop
+
+    public void OnGameBegin()
     {
         mScore = 0;
         mIntoxication = 0.0f;        
-        mStreetCred = .5f;        
+        mStreetCred = .5f;
+
+        SynchronizeUI();
     }
 
-    private void UpdateAllUI()
-    {
-        ScoreUI.SetScoreUI(mScore, mIntoxication, mStreetCred);
-    }
+    public void OnFrame(){}
+
+    #endregion
+        
+
+    #region Public Methods
 
     public void IncrementScore(int Points)
     {
@@ -72,9 +83,21 @@ public class ScoreManager : MonoBehaviour
         }   
     }
 
-    public void FinalizeScore()
+    #endregion
+
+
+    #region Private Methods
+
+    private void SynchronizeUI()
+    {
+        ScoreUI.SetScoreMetrics(mScore, mIntoxication, mStreetCred);
+    }
+
+    private void FinalizeScore()
     {
         ScoreUI.DisplayFinalScore();
         GameState.Instance.GameOver();
     }
+
+    #endregion
 }

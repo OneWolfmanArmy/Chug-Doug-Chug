@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Doug : MonoBehaviour
+public class Doug : MonoBehaviour, IGameLoop
 {
     public UIManager UI;
     public ScoreManager ScoreBoard;
@@ -10,18 +10,13 @@ public class Doug : MonoBehaviour
     
     private bool bDrinking;
 
-    public void Init()
+    public void OnGameBegin()
     {
-        ScoreBoard.Init();
-        CPManager.Init();
+        ScoreBoard.OnGameBegin();
+        CPManager.OnGameBegin();
 
         StartDrinking();
-    }
-
-    public void SetActive(bool Active)
-    {
-        CPManager.SetActive(Active);
-    }
+    }    
 
     public void OnFrame()
     {

@@ -23,8 +23,7 @@ public class ControlPoint : MonoBehaviour
 
     private Vector3 OriginalPos;
     private Quaternion OriginalRot;
-
-    private bool bActive;
+    
     private bool bDrifting;
     private bool bDragging;
 
@@ -56,8 +55,8 @@ public class ControlPoint : MonoBehaviour
 
     void OnMouseOver()
     {
-        if (bActive)
-        {
+        //if (bActive)
+       // {
             if (Input.GetMouseButtonDown(0))
             {
                 OnSelect();
@@ -70,7 +69,7 @@ public class ControlPoint : MonoBehaviour
             {
                 OnRelease();
             }
-        }
+       // }
     }
 
     void OnMouseExit()
@@ -85,12 +84,7 @@ public class ControlPoint : MonoBehaviour
     public void Init()
     {
         ResetNode();
-    }
-
-    public void SetActive(bool bActivate)
-    {
-        bActive = bActivate;
-    }
+    }    
 
     public void Destabilize(System.Action Callback, float Delay)
     {
@@ -163,7 +157,6 @@ public class ControlPoint : MonoBehaviour
     {
         transform.position = OriginalPos;
         transform.rotation = OriginalRot;
-        bActive = true;
         bDrifting = false;
         bDragging = false;
         mRigidbody2D.velocity = Vector2.zero;

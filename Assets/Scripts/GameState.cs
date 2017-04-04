@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class GameState : MonoBehaviour
+public class GameState : MonoBehaviour, IGameLoop
 {
     public static GameState Instance = null;
 
@@ -52,8 +52,24 @@ public class GameState : MonoBehaviour
 
     #endregion
 
+
+    #region IGameLoop
+
+    public void OnGameBegin()
+    {
+
+    }
+
+    public void OnFrame()
+    {
+
+    }
+
+    #endregion
+
+
     #region Public Methods
-    
+
     public void Pause()
     {
         if (mState == State.Playing)
@@ -108,15 +124,16 @@ public class GameState : MonoBehaviour
                 SceneManager.LoadScene(GameSceneName);
                 break;
             case State.Playing:
-                mDoug.SetActive(true);
+               // mDoug.SetRunning(true);
                 break;
             case State.Paused:
                 Time.timeScale = 0;
+               // mPauseOverlay.layer = mDoug.gameObject.layer;
                 break;
             case State.InGameMenu:
                 break;
             case State.GameOver:
-                mDoug.SetActive(false);
+               // mDoug.SetRunning(false);
                 break;
             default:
 
@@ -137,21 +154,22 @@ public class GameState : MonoBehaviour
             case State.Tutorial:
 
                 mDoug = GameObject.Find("Doug").GetComponent<Doug>();
-                mUIManager = GameObject.Find("Canvas_UI").GetComponent<UIManager>();
-                mDoug.Init();
-                mUIManager.Init();
+                mUIManager = GameObject.Find("Canvases").GetComponent<UIManager>();
+                mDoug.OnGameBegin();
+                mUIManager.OnGameBegin();
                 break;
             case State.Playing:
-                mDoug.SetActive(false);
+               // mDoug.SetRunning(false);
                 break;
             case State.Paused:
                 Time.timeScale = 1;
+                //mPauseOverlay.layer = Physics2D.IgnoreRaycastLayer;
                 break;
             case State.InGameMenu:
                 break;
             case State.GameOver:
-                mDoug.Init();
-                mUIManager.Init();
+                mDoug.OnGameBegin();
+                mUIManager.OnGameBegin();
                 break;
             default:
 

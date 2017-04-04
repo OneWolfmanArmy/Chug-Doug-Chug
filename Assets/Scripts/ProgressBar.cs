@@ -10,9 +10,10 @@ public class ProgressBar : MonoBehaviour
     {
         if(Frame == null || Filling == null)
         {
+            Debug.Log("Error: Missing reference to Frame or Filling in ProgressBar " + gameObject.name);
             return;
         }
 
-        Filling.rectTransform.localScale = new Vector2(1.0f, Ratio);
+        Filling.rectTransform.localScale = new Vector3(1.0f, Ratio, 1.0f);
     }
 }
