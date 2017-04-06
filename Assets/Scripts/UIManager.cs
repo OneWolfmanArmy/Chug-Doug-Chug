@@ -62,6 +62,8 @@ public class UIManager : MonoBehaviour, IGameLoop
 
     public void OnExitTutorialButtonPressed()
     {
+        PauseButton.gameObject.SetActive(true);
+        ExitButton.gameObject.SetActive(true);
         TutorialDisplay.ExitTutorial();
     }
 
@@ -70,6 +72,8 @@ public class UIManager : MonoBehaviour, IGameLoop
         FinalScoreDisplay.gameObject.SetActive(false);
         GameOverOverlay.gameObject.SetActive(false);
         FGCanvas.gameObject.SetActive(false);
+        IntoxicationBar.gameObject.SetActive(true);
+        CredBar.gameObject.SetActive(true);
         GameState.Instance.BeginPlay();
     }
 

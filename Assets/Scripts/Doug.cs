@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class Doug : MonoBehaviour, IGameLoop
 {
-    public UIManager UI;
     public ScoreManager ScoreBoard;
     public ControlPointManager CPManager;
     

@@ -6,8 +6,7 @@ public class ControlPoint : MonoBehaviour
 {
     #region Editor
 
-    public GameObject Target;
-    public Transform Node;
+    //public GameObject Target;
     public float NodeRadius;
     public float DragSpeed;
     public float MinGravity;
@@ -39,37 +38,32 @@ public class ControlPoint : MonoBehaviour
     {
         mRigidbody2D = GetComponent<Rigidbody2D>();
         mSpriteRenderer = GetComponent<SpriteRenderer>();
-        //Target.transform.position = Node.transform.position;
         OriginalPos = transform.position;
         OriginalRot = transform.rotation;
-        // ResetNode();
     }
 
     void OnDrawGizmos()
     {
         UnityEditor.Handles.color = Color.blue;
-        UnityEditor.Handles.DrawWireDisc(Node.position, Vector3.forward, NodeRadius);
-        UnityEditor.Handles.color = Color.yellow;
-        UnityEditor.Handles.DrawWireDisc(Target.transform.position, Vector3.forward, NodeRadius);
+        UnityEditor.Handles.DrawWireDisc(transform.position, Vector3.forward, NodeRadius);
+        //UnityEditor.Handles.color = Color.yellow;
+        //UnityEditor.Handles.DrawWireDisc(Target.transform.position, Vector3.forward, NodeRadius);
     }
 
     void OnMouseOver()
     {
-        //if (bActive)
-       // {
-            if (Input.GetMouseButtonDown(0))
-            {
-                OnSelect();
-            }
-            else if (Input.GetMouseButton(0))
-            {
-                OnMouseMove();
-            }
-            else if (Input.GetMouseButtonUp(0))
-            {
-                OnRelease();
-            }
-       // }
+        if (Input.GetMouseButtonDown(0))
+        {
+            OnSelect();
+        }
+        else if (Input.GetMouseButton(0))
+        {
+            OnMouseMove();
+        }
+        else if (Input.GetMouseButtonUp(0))
+        {
+            OnRelease();
+        }       
     }
 
     void OnMouseExit()
@@ -83,7 +77,10 @@ public class ControlPoint : MonoBehaviour
 
     public void Init()
     {
-        ResetNode();
+        if (mRigidbody2D != null)
+        {
+            ResetNode();
+        }
     }    
 
     public void Destabilize(System.Action Callback, float Delay)
@@ -141,7 +138,9 @@ public class ControlPoint : MonoBehaviour
         {
             // mRigidbody2D.gravityScale = 0;
             Vector2 Delta = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
-            mRigidbody2D.velocity = Delta * DragSpeed;
+            Debug.Log(Delta);
+            transform.position += (Vector3)(Delta * DragSpeed);
+            //mRigidbody2D.velocity = Delta * DragSpeed;
         }
     }
 
@@ -159,9 +158,13 @@ public class ControlPoint : MonoBehaviour
         transform.rotation = OriginalRot;
         bDrifting = false;
         bDragging = false;
-        mRigidbody2D.velocity = Vector2.zero;
-        mRigidbody2D.angularVelocity = 0;
-        mRigidbody2D.gravityScale = 0;
+        if (mRigidbody2D != null)
+        {
+            mRigidbody2D.velocity = Vector2.zero;
+            mRigidbody2D.angularVelocity = 0;
+            mRigidbody2D.gravityScale = 0;
+        }
+        OnDriftExit();
     }
 
     #endregion

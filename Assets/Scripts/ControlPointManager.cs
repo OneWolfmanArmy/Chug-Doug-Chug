@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class ControlPointManager : MonoBehaviour, IGameLoop
 {
+    public ControlPoint DebugCP;
+
     [System.Serializable]
     public struct Difficulty
     {
@@ -13,6 +15,7 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
     public Difficulty[] Difficulties;
 
     public ControlPoint[] ControlPoints;
+
     
     private int mDifficultyLevel;
     private Difficulty mDifficulty;
@@ -28,7 +31,10 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
         mDifficultyLevel = 1;
         for(int i = 0; i < ControlPoints.Length; i++)
         {
-            ControlPoints[i].Init();
+            if (ControlPoints[i].gameObject != null)
+            {
+                ControlPoints[i].Init();
+            }
         }
     }
     
@@ -42,27 +48,42 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
 
     public void IncreaseDifficulty()
     {
-        mDifficulty = Difficulties[mDifficultyLevel];
-        mDifficultyLevel++;
+        if (DebugCP == null)
+        {
+            mDifficulty = Difficulties[mDifficultyLevel];
+            mDifficultyLevel++;
+        }
     }
 
     private void ResetControlNodes()
     {
         for (int i = 0; i < ControlPoints.Length; i++)
         {
-            ControlPoints[i].ResetNode();
+            if (ControlPoints[i] != null)
+            {
+                ControlPoints[i].ResetNode();
+            }
         }
     }
 
 
     private void SelectNextDrifter()
     {
-        int RandomIndex = Random.Range(0, mStableCP.Count);
-        ControlPoint ToDriftCP = mStableCP[RandomIndex];
+        ControlPoint ToDriftCP;
+        if (DebugCP == null)
+        {
+            int RandomIndex = Random.Range(0, mStableCP.Count);
+            ToDriftCP = mStableCP[RandomIndex];            
+        }
+        else
+        {
+            ToDriftCP = DebugCP;
+        }
+
         mStableCP.Remove(ToDriftCP);
         mDriftingCP.Add(ToDriftCP);
         float RandomDelay = Random.Range(mDifficulty.MinDriftDelay, mDifficulty.MaxDriftDelay);
-        ToDriftCP.Destabilize(() => RemoveFromDriftingList(ToDriftCP), RandomDelay);
+        ToDriftCP.Destabilize(() => RemoveFromDriftingList(ToDriftCP), RandomDelay);   
     }
 
     private void RemoveFromDriftingList(ControlPoint ToStableCP)

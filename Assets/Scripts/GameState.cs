@@ -114,7 +114,7 @@ public class GameState : MonoBehaviour, IGameLoop
         //Exit state before entering new one
         ExitCurrentState();
 
-        Debug.Log("Entering state " + EntryState + "...");
+        //Debug.Log("Entering state " + EntryState + "...");
         switch (EntryState)
         {
             case State.MainMenu:
@@ -146,7 +146,7 @@ public class GameState : MonoBehaviour, IGameLoop
 
     private void ExitCurrentState()
     {
-        Debug.Log("Exiting state " + mState + "...");
+        //Debug.Log("Exiting state " + mState + "...");
         switch (mState)
         {
             case State.MainMenu:
@@ -179,7 +179,7 @@ public class GameState : MonoBehaviour, IGameLoop
 
     private void ProcessCurrentState()
     {
-        Debug.Log("Updating state " + mState + "...");
+        //Debug.Log("Updating state " + mState + "...");
         switch (mState)
         {
             case State.MainMenu:
