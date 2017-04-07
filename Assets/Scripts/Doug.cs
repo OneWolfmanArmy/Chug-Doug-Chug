@@ -6,13 +6,21 @@ public class Doug : MonoBehaviour, IGameLoop
 {
     public ScoreManager ScoreBoard;
     public ControlPointManager CPManager;
+
+    public Transform BeerSrc;
+    public Transform BeerDst;
+
+    public float MinDrinkingDistance;
     
+
     private bool bDrinking;
 
     public void OnGameBegin()
     {
         ScoreBoard.OnGameBegin();
         CPManager.OnGameBegin();
+
+        MinDrinkingDistance *= MinDrinkingDistance;
 
         StartDrinking();
     }    
@@ -21,7 +29,7 @@ public class Doug : MonoBehaviour, IGameLoop
     {
         CPManager.OnFrame();
 
-        if(bDrinking)
+        if(CanDrink())
         {
             ScoreBoard.IncrementIntoxication();
         }
@@ -35,6 +43,11 @@ public class Doug : MonoBehaviour, IGameLoop
     public void StopDrinking()
     {
         bDrinking = false;
+    }
+
+    private bool CanDrink()
+    {
+        return Vector2.SqrMagnitude(BeerDst.position - BeerSrc.position) <= MinDrinkingDistance;
     }
 
 

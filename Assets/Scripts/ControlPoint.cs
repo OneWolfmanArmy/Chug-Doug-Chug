@@ -139,8 +139,8 @@ public class ControlPoint : MonoBehaviour
             // mRigidbody2D.gravityScale = 0;
             Vector2 Delta = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
             Debug.Log(Delta);
-            transform.position += (Vector3)(Delta * DragSpeed);
-            //mRigidbody2D.velocity = Delta * DragSpeed;
+            //transform.position += (Vector3)(Delta * DragSpeed);
+            mRigidbody2D.velocity = Delta * DragSpeed;
         }
     }
 
