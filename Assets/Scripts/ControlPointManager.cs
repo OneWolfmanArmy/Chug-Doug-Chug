@@ -33,7 +33,7 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
         {
             if (ControlPoints[i].gameObject != null)
             {
-                ControlPoints[i].Init();
+                ControlPoints[i].OnGameBegin();
             }
         }
     }
@@ -83,12 +83,29 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
         mStableCP.Remove(ToDriftCP);
         mDriftingCP.Add(ToDriftCP);
         float RandomDelay = Random.Range(mDifficulty.MinDriftDelay, mDifficulty.MaxDriftDelay);
-        ToDriftCP.Destabilize(() => RemoveFromDriftingList(ToDriftCP), RandomDelay);   
+        ToDriftCP.Destabilize(() => {
+            RemoveFromDriftingList(ToDriftCP);
+        }        
+        , RandomDelay);
+
+        for (int i = 0; i < mStableCP.Count; i++)
+        {
+            if (mStableCP[i].Influence < ToDriftCP.Influence)
+            {
+                mStableCP[i].SetRigidBodyType(RigidbodyType2D.Dynamic);
+            }
+        }
     }
 
     private void RemoveFromDriftingList(ControlPoint ToStableCP)
     {
         mDriftingCP.Remove(ToStableCP);
         mStableCP.Add(ToStableCP);
+      //  for(int i = 0; i < ControlPoints.Length; i++)
+       // {
+          //  ControlPoints[i].GetComponent<Rigidbody2D>().velocity = Vector3.zero;
+          //  ControlPoints[i].GetComponent<Rigidbody2D>().angularVelocity = 0;
+        //}
     }
+
 }

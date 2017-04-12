@@ -2,12 +2,12 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class ControlPoint : MonoBehaviour
+public class ControlPoint : MonoBehaviour, IGameLoop
 {
     #region Editor
 
-    //public GameObject Target;
-    public float NodeRadius;
+    public float Influence;
+    public float StartRotation;
     public float DragSpeed;
     public float MinGravity;
     public float MaxGravity;
@@ -38,17 +38,18 @@ public class ControlPoint : MonoBehaviour
     {
         mRigidbody2D = GetComponent<Rigidbody2D>();
         mSpriteRenderer = GetComponent<SpriteRenderer>();
-        OriginalPos = transform.position;
-        OriginalRot = transform.rotation;
+        OriginalPos = transform.localPosition;
+        OriginalRot = Quaternion.Euler(StartRotation * Vector3.forward);
     }
 
-    void OnDrawGizmos()
-    {
-        UnityEditor.Handles.color = Color.blue;
-        UnityEditor.Handles.DrawWireDisc(transform.position, Vector3.forward, NodeRadius);
-        //UnityEditor.Handles.color = Color.yellow;
-        //UnityEditor.Handles.DrawWireDisc(Target.transform.position, Vector3.forward, NodeRadius);
-    }
+
+    /* void OnDrawGizmos()
+     {
+         UnityEditor.Handles.color = Color.blue;
+         UnityEditor.Handles.DrawWireDisc(transform.position, Vector3.forward, NodeRadius);
+         //UnityEditor.Handles.color = Color.yellow;
+         //UnityEditor.Handles.DrawWireDisc(Target.transform.position, Vector3.forward, NodeRadius);
+     }*/
 
     void OnMouseOver()
     {
@@ -73,14 +74,32 @@ public class ControlPoint : MonoBehaviour
 
     #endregion
 
-    #region Public Class Methods
 
-    public void Init()
+    #region IGameLoop
+
+    public void OnGameBegin()
     {
         if (mRigidbody2D != null)
         {
             ResetNode();
         }
+    }
+
+    public void OnFrame()
+    {
+
+    }
+
+    #endregion
+
+
+    #region Public Class Methods
+
+
+    public void SetRigidBodyType(RigidbodyType2D Type)
+    {
+        //mRigidbody2D.constraints = RigidbodyConstraints2D.None;
+        mRigidbody2D.bodyType = Type;
     }    
 
     public void Destabilize(System.Action Callback, float Delay)
@@ -97,6 +116,7 @@ public class ControlPoint : MonoBehaviour
     private void OnDriftEnter()
     {
         bDrifting = true;
+        mRigidbody2D.bodyType = RigidbodyType2D.Dynamic;
         mRigidbody2D.gravityScale = Random.Range(MinGravity, MaxGravity);
         mSpriteRenderer.color = Color.red;
     }
@@ -119,6 +139,7 @@ public class ControlPoint : MonoBehaviour
         bDragging = false;
         mSpriteRenderer.color = Color.white;
         mRigidbody2D.velocity = Vector2.zero;
+        mRigidbody2D.gravityScale = 0;
         UpdateControlPointManager();
         //ResetNode();       
     }
@@ -154,8 +175,8 @@ public class ControlPoint : MonoBehaviour
 
     public void ResetNode()
     {
-        transform.position = OriginalPos;
-        transform.rotation = OriginalRot;
+        transform.localPosition = OriginalPos;
+        transform.localRotation = OriginalRot;
         bDrifting = false;
         bDragging = false;
         if (mRigidbody2D != null)
@@ -164,7 +185,10 @@ public class ControlPoint : MonoBehaviour
             mRigidbody2D.angularVelocity = 0;
             mRigidbody2D.gravityScale = 0;
         }
-        OnDriftExit();
+        if (mSpriteRenderer != null)
+        {
+            mSpriteRenderer.color = Color.white;
+        }
     }
 
     #endregion

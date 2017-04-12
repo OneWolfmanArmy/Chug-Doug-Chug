@@ -57,12 +57,13 @@ public class GameState : MonoBehaviour, IGameLoop
 
     public void OnGameBegin()
     {
-
+        mDoug.OnGameBegin();
+        mUIManager.OnGameBegin();
     }
 
     public void OnFrame()
     {
-
+        mDoug.OnFrame();
     }
 
     #endregion
@@ -124,16 +125,13 @@ public class GameState : MonoBehaviour, IGameLoop
                 SceneManager.LoadScene(GameSceneName);
                 break;
             case State.Playing:
-               // mDoug.SetRunning(true);
                 break;
             case State.Paused:
                 Time.timeScale = 0;
-               // mPauseOverlay.layer = mDoug.gameObject.layer;
                 break;
             case State.InGameMenu:
                 break;
             case State.GameOver:
-               // mDoug.SetRunning(false);
                 break;
             default:
 
@@ -152,24 +150,19 @@ public class GameState : MonoBehaviour, IGameLoop
             case State.MainMenu:
                 break;
             case State.Tutorial:
-
                 mDoug = GameObject.Find("Doug").GetComponent<Doug>();
                 mUIManager = GameObject.Find("Canvases").GetComponent<UIManager>();
-                mDoug.OnGameBegin();
-                mUIManager.OnGameBegin();
+                OnGameBegin();
                 break;
             case State.Playing:
-               // mDoug.SetRunning(false);
                 break;
             case State.Paused:
                 Time.timeScale = 1;
-                //mPauseOverlay.layer = Physics2D.IgnoreRaycastLayer;
                 break;
             case State.InGameMenu:
                 break;
             case State.GameOver:
-                mDoug.OnGameBegin();
-                mUIManager.OnGameBegin();
+                OnGameBegin();
                 break;
             default:
 
@@ -187,7 +180,7 @@ public class GameState : MonoBehaviour, IGameLoop
             case State.Tutorial:
                 break;
             case State.Playing:
-                mDoug.OnFrame();
+                OnFrame();
                 break;
             case State.Paused:
                 break;
