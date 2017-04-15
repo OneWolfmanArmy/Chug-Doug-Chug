@@ -2,14 +2,12 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class GameState : MonoBehaviour
+public class GameState : MonoBehaviour, IGameLoop
 {
     public static GameState Instance = null;
 
     #region Editor
-
-    public ControlPointManager CPManager;
-
+    
     #endregion
 
 
@@ -21,6 +19,9 @@ public class GameState : MonoBehaviour
     private enum State {Default, MainMenu, Tutorial, Playing, Paused, InGameMenu, GameOver};
     private State mState;
     private bool bCanUpdate = false;
+    
+    private Doug mDoug;
+    private UIManager mUIManager;
 
     #endregion
 
@@ -43,7 +44,7 @@ public class GameState : MonoBehaviour
 
     void Update()
     {
-        if (bCanUpdate)
+        if (bCanUpdate || mState == State.Default)
         {
             ProcessCurrentState();
         }
@@ -51,8 +52,25 @@ public class GameState : MonoBehaviour
 
     #endregion
 
+
+    #region IGameLoop
+
+    public void OnGameBegin()
+    {
+        mDoug.OnGameBegin();
+        mUIManager.OnGameBegin();
+    }
+
+    public void OnFrame()
+    {
+        mDoug.OnFrame();
+    }
+
+    #endregion
+
+
     #region Public Methods
-    
+
     public void Pause()
     {
         if (mState == State.Playing)
@@ -97,17 +115,16 @@ public class GameState : MonoBehaviour
         //Exit state before entering new one
         ExitCurrentState();
 
-        Debug.Log("Entering state " + EntryState + "...");
+        //Debug.Log("Entering state " + EntryState + "...");
         switch (EntryState)
         {
             case State.MainMenu:
                 SceneManager.LoadScene(MainMenuSceneName);
                 break;
             case State.Tutorial:
-                SceneManager.LoadScene(GameSceneName);             
+                SceneManager.LoadScene(GameSceneName);
                 break;
             case State.Playing:
-                CPManager.SetActive(true);
                 break;
             case State.Paused:
                 Time.timeScale = 0;
@@ -117,6 +134,7 @@ public class GameState : MonoBehaviour
             case State.GameOver:
                 break;
             default:
+
                 break;
         }
 
@@ -126,16 +144,17 @@ public class GameState : MonoBehaviour
 
     private void ExitCurrentState()
     {
-        Debug.Log("Exiting state " + mState + "...");
+        //Debug.Log("Exiting state " + mState + "...");
         switch (mState)
         {
             case State.MainMenu:
                 break;
             case State.Tutorial:
-                CPManager = GameObject.Find("ControlPoints").GetComponent<ControlPointManager>();
+                mDoug = GameObject.Find("Doug").GetComponent<Doug>();
+                mUIManager = GameObject.Find("Canvases").GetComponent<UIManager>();
+                OnGameBegin();
                 break;
             case State.Playing:
-                CPManager.SetActive(false);
                 break;
             case State.Paused:
                 Time.timeScale = 1;
@@ -143,34 +162,25 @@ public class GameState : MonoBehaviour
             case State.InGameMenu:
                 break;
             case State.GameOver:
+                OnGameBegin();
                 break;
             default:
+
                 break;
         }
     }
 
     private void ProcessCurrentState()
     {
-        Debug.Log("Updating state " + mState + "...");
+        //Debug.Log("Updating state " + mState + "...");
         switch (mState)
         {
-            case State.Default:
-                string SceneName = SceneManager.GetActiveScene().name;
-                if (SceneName == MainMenuSceneName)
-                {
-                    EnterState(State.MainMenu);
-                }
-                else if(SceneName == GameSceneName)
-                {
-                    EnterState(State.Tutorial);
-                }
-                break;
             case State.MainMenu:
                 break;
             case State.Tutorial:
                 break;
             case State.Playing:
-                CPManager.Update();
+                OnFrame();
                 break;
             case State.Paused:
                 break;
@@ -179,7 +189,15 @@ public class GameState : MonoBehaviour
             case State.GameOver:
                 break;
             default:
-                
+                string SceneName = SceneManager.GetActiveScene().name;
+                if (SceneName == MainMenuSceneName)
+                {
+                    EnterState(State.MainMenu);
+                }
+                else if (SceneName == GameSceneName)
+                {
+                    EnterState(State.Tutorial);
+                }
                 break;
         }
     } 

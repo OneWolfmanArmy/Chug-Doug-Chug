@@ -2,32 +2,43 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ScoreManager : MonoBehaviour
+public class ScoreManager : MonoBehaviour, IGameLoop
 {
+    #region Editor
+
     public UIManager ScoreUI;
 
     public float DrinkMultiplier;
     public float IntoxicationRate;
     public float StreetCredRate;
+       
+    private const float FATAL_INTOXICATION = 1.0f;
+    private const float FATAL_STREETCRED = 0.0f;
 
     private int mScore;
     private float mIntoxication;
     private float mStreetCred;
 
-    void Start()
+    #endregion
+
+
+    #region IGameLoop
+
+    public void OnGameBegin()
     {
         mScore = 0;
         mIntoxication = 0.0f;        
         mStreetCred = .5f;
-        UpdateAllUI();
+
+        SynchronizeUI();
     }
 
-    private void UpdateAllUI()
-    {
-        ScoreUI.UpdateIntoxicationBar(mIntoxication);
-        ScoreUI.UpdateStreetCredBar(mStreetCred);
-        ScoreUI.UpdateScoreText(mScore);
-    }
+    public void OnFrame(){}
+
+    #endregion
+        
+
+    #region Public Methods
 
     public void IncrementScore(int Points)
     {
@@ -37,12 +48,15 @@ public class ScoreManager : MonoBehaviour
     public void IncrementIntoxication()
     {
         mIntoxication += IntoxicationRate * Time.deltaTime;
-        if(mIntoxication >= 1)
+        if (mIntoxication >= FATAL_INTOXICATION)
         {
-            GameState.Instance.GameOver();
+            ScoreUI.UpdateIntoxicationBar(FATAL_INTOXICATION);
+            FinalizeScore();
         }
-
-        ScoreUI.UpdateIntoxicationBar(mIntoxication);
+        else
+        {
+            ScoreUI.UpdateIntoxicationBar(mIntoxication);
+        }
     }
 
     public void IncrementStreetCred()
@@ -58,9 +72,32 @@ public class ScoreManager : MonoBehaviour
     public void DecrementStreetCred()
     {
         mStreetCred -= StreetCredRate * Time.deltaTime;
-        if(mStreetCred <= 0.0f)
+        if(mStreetCred <= FATAL_STREETCRED)
         {
-            GameState.Instance.GameOver();
+            ScoreUI.UpdateIntoxicationBar(FATAL_STREETCRED);
+            FinalizeScore();
         }
+        else
+        {
+            ScoreUI.UpdateIntoxicationBar(mStreetCred);
+        }   
     }
+
+    #endregion
+
+
+    #region Private Methods
+
+    private void SynchronizeUI()
+    {
+        ScoreUI.SetScoreMetrics(mScore, mIntoxication, mStreetCred);
+    }
+
+    private void FinalizeScore()
+    {
+        ScoreUI.DisplayFinalScore();
+        GameState.Instance.GameOver();
+    }
+
+    #endregion
 }
