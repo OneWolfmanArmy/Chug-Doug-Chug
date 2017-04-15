@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class ControlPointManager : MonoBehaviour, IGameLoop
@@ -11,6 +12,7 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
         public int MaxDriftCount;
         public float MinDriftDelay;
         public float MaxDriftDelay;
+        public float MaxDriftTime;
     }
     public Difficulty[] Difficulties;
 
@@ -66,7 +68,6 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
         }
     }
 
-
     private void SelectNextDrifter()
     {
         ControlPoint ToDriftCP;
@@ -81,13 +82,23 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
         }
 
         mStableCP.Remove(ToDriftCP);
-        mDriftingCP.Add(ToDriftCP);
+
+        int index;
+        for(index = 0; index < mDriftingCP.Count; index++)
+        {
+            if(ToDriftCP.Influence > mDriftingCP[index].Influence)
+            {
+                break;
+            }
+        }
+        mDriftingCP.Insert(index, ToDriftCP);
+
         float RandomDelay = Random.Range(mDifficulty.MinDriftDelay, mDifficulty.MaxDriftDelay);
         ToDriftCP.Destabilize(() => {
             RemoveFromDriftingList(ToDriftCP);
         }        
-        , RandomDelay);
-
+        , RandomDelay, mDifficulty.MaxDriftTime);
+        
         for (int i = 0; i < mStableCP.Count; i++)
         {
             if (mStableCP[i].Influence < ToDriftCP.Influence)
@@ -97,15 +108,24 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
         }
     }
 
-    private void RemoveFromDriftingList(ControlPoint ToStableCP)
+    void RemoveFromDriftingList(ControlPoint ToStableCP)
     {
-        mDriftingCP.Remove(ToStableCP);
-        mStableCP.Add(ToStableCP);
-      //  for(int i = 0; i < ControlPoints.Length; i++)
-       // {
-          //  ControlPoints[i].GetComponent<Rigidbody2D>().velocity = Vector3.zero;
-          //  ControlPoints[i].GetComponent<Rigidbody2D>().angularVelocity = 0;
-        //}
+        if (mDriftingCP.Contains(ToStableCP))
+        {
+            mDriftingCP.Remove(ToStableCP);
+            mStableCP.Add(ToStableCP);
+            
+            for(int i = 0; i < ControlPoints.Length; i++)
+            {
+                if (mDriftingCP.Count == 0 || ControlPoints[i].Influence >= mDriftingCP[0].Influence)
+                {
+                    ControlPoints[i].GetComponent<Rigidbody2D>().velocity = Vector3.zero;
+                    ControlPoints[i].GetComponent<Rigidbody2D>().angularVelocity = 0;
+                    ControlPoints[i].SetRigidBodyType(RigidbodyType2D.Kinematic);
+                }
+            }
+        }
+
     }
 
 }
