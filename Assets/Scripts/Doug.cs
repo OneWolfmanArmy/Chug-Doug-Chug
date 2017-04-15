@@ -2,33 +2,39 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Doug : MonoBehaviour
+public class Doug : MonoBehaviour, IGameLoop
 {
     public ScoreManager ScoreBoard;
+    public ControlPointManager CPManager;
+
+    public Transform BeerSrc;
+    public Transform BeerDst;
+
+    public float MinDrinkingDistance;   
 
     private bool bDrinking;
 
-    void Start()
+    public void OnGameBegin()
     {
-        StartDrinking();
-    }
+        ScoreBoard.OnGameBegin();
+        CPManager.OnGameBegin();
 
-    void Update()
+        MinDrinkingDistance *= MinDrinkingDistance;
+    }    
+
+    public void OnFrame()
     {
-        if(bDrinking)
+        CPManager.OnFrame();
+
+        if(DrinkingDistance())
         {
             ScoreBoard.IncrementIntoxication();
         }
     }
 
-    public void StartDrinking()
+    private bool DrinkingDistance()
     {
-        bDrinking = true;
-    }
-
-    public void StopDrinking()
-    {
-        bDrinking = false;
+        return Vector2.SqrMagnitude(BeerDst.position - BeerSrc.position) <= MinDrinkingDistance;
     }
 
 

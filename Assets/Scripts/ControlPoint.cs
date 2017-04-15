@@ -2,13 +2,12 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class ControlPoint : MonoBehaviour
+public class ControlPoint : MonoBehaviour, IGameLoop
 {
     #region Editor
 
-    public GameObject Target;
-    public Transform Node;
-    public float NodeRadius;
+    public float Influence;
+    public float StartRotation;
     public float DragSpeed;
     public float MinGravity;
     public float MaxGravity;
@@ -21,11 +20,12 @@ public class ControlPoint : MonoBehaviour
     private Rigidbody2D mRigidbody2D;
     private SpriteRenderer mSpriteRenderer;
 
-    private bool bActive;
-    private bool bDrifting;
-    private bool bDragging;
+    private Vector3 OriginalPos;
+    private Quaternion OriginalRot;
     
-    private float mDriftForce;
+    private bool bDrifting;
+    private float mDriftTime;
+    private bool bDragging;
 
     private System.Action UpdateControlPointManager;
 
@@ -35,41 +35,37 @@ public class ControlPoint : MonoBehaviour
     #region MonoBehavior
 
     // Use this for initialization
-    void Start ()
+    void Start()
     {
         mRigidbody2D = GetComponent<Rigidbody2D>();
         mSpriteRenderer = GetComponent<SpriteRenderer>();
-
-        Target.transform.position = Node.position;
-
-        ResetNode();
+        OriginalPos = transform.localPosition;
+        OriginalRot = Quaternion.Euler(StartRotation * Vector3.forward);
     }
 
-    void OnDrawGizmos()
-    {
-        UnityEditor.Handles.color = Color.blue;
-        UnityEditor.Handles.DrawWireDisc(Node.position, Vector3.forward, NodeRadius);
-        UnityEditor.Handles.color = Color.yellow;
-        UnityEditor.Handles.DrawWireDisc(Target.transform.position, Vector3.forward, NodeRadius);
-    }
+
+    /* void OnDrawGizmos()
+     {
+         UnityEditor.Handles.color = Color.blue;
+         UnityEditor.Handles.DrawWireDisc(transform.position, Vector3.forward, NodeRadius);
+         //UnityEditor.Handles.color = Color.yellow;
+         //UnityEditor.Handles.DrawWireDisc(Target.transform.position, Vector3.forward, NodeRadius);
+     }*/
 
     void OnMouseOver()
     {
-        if (bActive)
+        if (Input.GetMouseButtonDown(0))
         {
-            if (Input.GetMouseButtonDown(0))
-            {
-                OnSelect();
-            }
-            else if (Input.GetMouseButton(0))
-            {
-                OnMouseMove();
-            }
-            else if (Input.GetMouseButtonUp(0))
-            {
-                OnRelease();
-            }
+            OnSelect();
         }
+        else if (Input.GetMouseButton(0))
+        {
+            OnMouseMove();
+        }
+        else if (Input.GetMouseButtonUp(0))
+        {
+            OnRelease();
+        }       
     }
 
     void OnMouseExit()
@@ -79,17 +75,38 @@ public class ControlPoint : MonoBehaviour
 
     #endregion
 
-    #region Public Class Methods
 
-    public void SetActive(bool bActivate)
+    #region IGameLoop
+
+    public void OnGameBegin()
     {
-        bActive = bActivate;
+        if (mRigidbody2D != null)
+        {
+            ResetNode();
+        }
     }
 
-    public void Destabilize(System.Action Callback, float Delay)
+    public void OnFrame()
+    {
+    }
+
+    #endregion
+
+
+    #region Public Class Methods
+
+
+    public void SetRigidBodyType(RigidbodyType2D Type)
+    {
+        //mRigidbody2D.constraints = RigidbodyConstraints2D.None;
+        mRigidbody2D.bodyType = Type;
+    }    
+
+    public void Destabilize(System.Action Callback, float Delay, float MaxTime)
     {
         UpdateControlPointManager = Callback;
         Invoke("OnDriftEnter", Delay);
+        Invoke("OnDriftExit", Delay + MaxTime);
     }
 
     #endregion
@@ -100,21 +117,27 @@ public class ControlPoint : MonoBehaviour
     private void OnDriftEnter()
     {
         bDrifting = true;
+        mRigidbody2D.bodyType = RigidbodyType2D.Dynamic;
         mRigidbody2D.gravityScale = Random.Range(MinGravity, MaxGravity);
-        mSpriteRenderer.color = Color.red;
+        mRigidbody2D.angularVelocity = Random.Range(-.1f, .1f);
+        ChangeSpriteColor(Color.red);
     }
 
     private void OnDriftExit()
     {
-        bDrifting = false;
-        mSpriteRenderer.color = Color.white;
-        mRigidbody2D.gravityScale = 0;
+        if (bDrifting)
+        {
+            bDrifting = false;
+            ChangeSpriteColor(Color.white);
+            mRigidbody2D.gravityScale = 0;
+            UpdateControlPointManager();
+        }
     }
 
     private void OnDragEnter()
     {
         bDragging = true;
-        mSpriteRenderer.color = Color.blue;
+        ChangeSpriteColor(Color.blue);
     }
 
     private void OnDragExit()
@@ -122,8 +145,8 @@ public class ControlPoint : MonoBehaviour
         bDragging = false;
         mSpriteRenderer.color = Color.white;
         mRigidbody2D.velocity = Vector2.zero;
+        mRigidbody2D.gravityScale = 0;
         UpdateControlPointManager();
-        ResetNode();       
     }
 
     private void OnSelect()
@@ -139,9 +162,8 @@ public class ControlPoint : MonoBehaviour
     {
         if(bDragging)
         {
-            // mRigidbody2D.gravityScale = 0;
             Vector2 Delta = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
-            mRigidbody2D.velocity = Delta * DragSpeed;
+            mRigidbody2D.AddForce(Delta * DragSpeed);
         }
     }
 
@@ -153,14 +175,28 @@ public class ControlPoint : MonoBehaviour
         }
     }  
 
-    private void ResetNode()
+    public void ResetNode()
     {
-        bActive = true;
+        transform.localPosition = OriginalPos;
+        transform.localRotation = OriginalRot;
         bDrifting = false;
         bDragging = false;
-        mRigidbody2D.velocity = Vector2.zero;
-        mRigidbody2D.angularVelocity = 0;
-        mRigidbody2D.gravityScale = 0;
+        if (mRigidbody2D != null)
+        {
+            mRigidbody2D.velocity = Vector2.zero;
+            mRigidbody2D.angularVelocity = 0;
+            mRigidbody2D.gravityScale = 0;
+            mRigidbody2D.bodyType = RigidbodyType2D.Kinematic;
+        }
+        ChangeSpriteColor(Color.white);
+    }
+
+    private void ChangeSpriteColor(Color Col)
+    {
+        if (mSpriteRenderer != null)
+        {
+            mSpriteRenderer.color = Col;
+        }
     }
 
     #endregion
