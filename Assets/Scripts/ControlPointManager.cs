@@ -46,6 +46,13 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
         {
             SelectNextDrifter();
         }
+        /*for (int i = 0; i < ControlPoints.Length; i++)
+        {
+            if (ControlPoints[i].gameObject != null)
+            {
+                ControlPoints[i].OnFrame();
+            }
+        }*/
     }
 
     public void IncreaseDifficulty()
@@ -101,7 +108,7 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
         
         for (int i = 0; i < mStableCP.Count; i++)
         {
-            if (mStableCP[i].Influence < ToDriftCP.Influence)
+            if (mStableCP[i].Influence <= ToDriftCP.Influence)
             {
                 mStableCP[i].SetRigidBodyType(RigidbodyType2D.Dynamic);
             }

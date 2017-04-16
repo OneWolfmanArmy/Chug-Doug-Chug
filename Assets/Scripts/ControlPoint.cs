@@ -6,6 +6,7 @@ public class ControlPoint : MonoBehaviour, IGameLoop
 {
     #region Editor
 
+    public SpriteRenderer MySprite;
     public float Influence;
     public float StartRotation;
     public float DragSpeed;
@@ -18,10 +19,10 @@ public class ControlPoint : MonoBehaviour, IGameLoop
     #region Properties
 
     private Rigidbody2D mRigidbody2D;
-    private SpriteRenderer mSpriteRenderer;
 
     private Vector3 OriginalPos;
     private Quaternion OriginalRot;
+    private Vector3 OriginalScale;
     
     private bool bDrifting;
     private float mDriftTime;
@@ -36,12 +37,27 @@ public class ControlPoint : MonoBehaviour, IGameLoop
 
     // Use this for initialization
     void Start()
-    {
+    {       
         mRigidbody2D = GetComponent<Rigidbody2D>();
-        mSpriteRenderer = GetComponent<SpriteRenderer>();
+        mRigidbody2D.bodyType = RigidbodyType2D.Kinematic;
+
         OriginalPos = transform.localPosition;
         OriginalRot = Quaternion.Euler(StartRotation * Vector3.forward);
     }
+
+    /*void Update()
+    {
+        Vector3 inv = new Vector3(1f / transform.parent.localScale.x, 1f / transform.parent.localScale.y, 1f / transform.parent.localScale.z);
+        if (inv != Vector3.one)
+        {
+            //transform.localScale = Vector3.one; //Vector3.Scale(transform.localScale, transform.parent.localScale);
+            Vector3 bounds = mSpriteRenderer.bounds.size;
+            transform.localScale = Vector3.Scale(transform.localScale, new Vector3(OriginalScale.x / bounds.x, OriginalScale.y / bounds.y, OriginalScale.z / bounds.z));
+
+            Debug.Log(gameObject.name + " " + mSpriteRenderer.bounds.size + " " + transform.localScale);
+
+        }
+    }*/
 
 
     /* void OnDrawGizmos()
@@ -88,6 +104,7 @@ public class ControlPoint : MonoBehaviour, IGameLoop
 
     public void OnFrame()
     {
+        
     }
 
     #endregion
@@ -119,7 +136,9 @@ public class ControlPoint : MonoBehaviour, IGameLoop
         bDrifting = true;
         mRigidbody2D.bodyType = RigidbodyType2D.Dynamic;
         mRigidbody2D.gravityScale = Random.Range(MinGravity, MaxGravity);
-        mRigidbody2D.angularVelocity = Random.Range(-.1f, .1f);
+        float ang = -10f;// * Mathf.Pow(-1, (int)Random.Range(0, 2));
+        Debug.Log(ang);
+        mRigidbody2D.AddTorque(ang);
         ChangeSpriteColor(Color.red);
     }
 
@@ -143,7 +162,7 @@ public class ControlPoint : MonoBehaviour, IGameLoop
     private void OnDragExit()
     {
         bDragging = false;
-        mSpriteRenderer.color = Color.white;
+        MySprite.color = Color.white;
         mRigidbody2D.velocity = Vector2.zero;
         mRigidbody2D.gravityScale = 0;
         UpdateControlPointManager();
@@ -193,9 +212,9 @@ public class ControlPoint : MonoBehaviour, IGameLoop
 
     private void ChangeSpriteColor(Color Col)
     {
-        if (mSpriteRenderer != null)
+        if (MySprite != null)
         {
-            mSpriteRenderer.color = Col;
+            MySprite.color = Col;
         }
     }
 
