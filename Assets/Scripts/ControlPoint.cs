@@ -120,10 +120,15 @@ public class ControlPoint : MonoBehaviour, IGameLoop
     {
         bDrifting = true;
         mRigidbody2D.bodyType = RigidbodyType2D.Dynamic;
-        mRigidbody2D.gravityScale = Random.Range(MinGravity, MaxGravity);
-        float ang = -10f;// * Mathf.Pow(-1, (int)Random.Range(0, 2));
-        Debug.Log(ang);
-        mRigidbody2D.AddTorque(ang);
+        //mRigidbody2D.gravityScale = Random.Range(MinGravity, MaxGravity);
+        mRigidbody2D.velocity = Vector2.down * 2.0f;
+        if(mRigidbody2D.centerOfMass.x == 0)
+        {
+            mRigidbody2D.AddTorque(10.0f);
+        }
+        //float ang = -100f * mRigidbody2D.centerOfMass.x;// * Mathf.Pow(-1, (int)Random.Range(0, 2));
+        //Debug.Log(ang);
+        //mRigidbody2D.AddTorque(ang);
         ChangeSpriteColor(Color.red);
     }
 
