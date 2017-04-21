@@ -45,20 +45,6 @@ public class ControlPoint : MonoBehaviour, IGameLoop
         OriginalRot = Quaternion.Euler(StartRotation * Vector3.forward);
     }
 
-    /*void Update()
-    {
-        Vector3 inv = new Vector3(1f / transform.parent.localScale.x, 1f / transform.parent.localScale.y, 1f / transform.parent.localScale.z);
-        if (inv != Vector3.one)
-        {
-            //transform.localScale = Vector3.one; //Vector3.Scale(transform.localScale, transform.parent.localScale);
-            Vector3 bounds = mSpriteRenderer.bounds.size;
-            transform.localScale = Vector3.Scale(transform.localScale, new Vector3(OriginalScale.x / bounds.x, OriginalScale.y / bounds.y, OriginalScale.z / bounds.z));
-
-            Debug.Log(gameObject.name + " " + mSpriteRenderer.bounds.size + " " + transform.localScale);
-
-        }
-    }*/
-
 
     /* void OnDrawGizmos()
      {
@@ -115,7 +101,6 @@ public class ControlPoint : MonoBehaviour, IGameLoop
 
     public void SetRigidBodyType(RigidbodyType2D Type)
     {
-        //mRigidbody2D.constraints = RigidbodyConstraints2D.None;
         mRigidbody2D.bodyType = Type;
     }    
 
