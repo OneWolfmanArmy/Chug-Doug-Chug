@@ -101,7 +101,10 @@ public class ControlPoint : MonoBehaviour, IGameLoop
 
     public void SetRigidBodyType(RigidbodyType2D Type)
     {
-        mRigidbody2D.bodyType = Type;
+        if (mRigidbody2D != null)
+        {
+            mRigidbody2D.bodyType = Type;
+        }
     }    
 
     public void Destabilize(System.Action Callback, float Delay, float MaxTime)
@@ -172,7 +175,7 @@ public class ControlPoint : MonoBehaviour, IGameLoop
         if(bDragging)
         {
             Vector2 Delta = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
-            mRigidbody2D.AddForce(Delta * DragSpeed);
+            mRigidbody2D.velocity = (Delta * DragSpeed);
         }
     }
 
