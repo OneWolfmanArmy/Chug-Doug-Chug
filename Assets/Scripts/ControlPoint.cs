@@ -9,9 +9,10 @@ public class ControlPoint : MonoBehaviour, IGameLoop
     public SpriteRenderer MySprite;
     public float Influence;
     public float StartRotation;
+    public float MinDriftSpeed;
+    public float MaxDriftSpeed;
     public float DragSpeed;
-    public float MinGravity;
-    public float MaxGravity;
+    public float MinDragDistance;
 
     #endregion
 
@@ -27,6 +28,7 @@ public class ControlPoint : MonoBehaviour, IGameLoop
     private bool bDrifting;
     private float mDriftTime;
     private bool bDragging;
+    private float mDragDistance;
 
     private System.Action UpdateControlPointManager;
 
@@ -123,15 +125,13 @@ public class ControlPoint : MonoBehaviour, IGameLoop
     {
         bDrifting = true;
         mRigidbody2D.bodyType = RigidbodyType2D.Dynamic;
-        //mRigidbody2D.gravityScale = Random.Range(MinGravity, MaxGravity);
-        mRigidbody2D.velocity = Vector2.down * 2.0f;
-        if(mRigidbody2D.centerOfMass.x == 0)
+        mRigidbody2D.velocity = Vector2.down * Random.Range(MinDriftSpeed, MaxDriftSpeed);
+        
+        if (Mathf.Abs(mRigidbody2D.centerOfMass.x) <= .05f)
         {
-            mRigidbody2D.AddTorque(10.0f);
+            mRigidbody2D.angularVelocity = 10f * Mathf.Pow(-1, Random.Range(0, 2));
         }
-        //float ang = -100f * mRigidbody2D.centerOfMass.x;// * Mathf.Pow(-1, (int)Random.Range(0, 2));
-        //Debug.Log(ang);
-        //mRigidbody2D.AddTorque(ang);
+
         ChangeSpriteColor(Color.red);
     }
 
@@ -141,7 +141,6 @@ public class ControlPoint : MonoBehaviour, IGameLoop
         {
             bDrifting = false;
             ChangeSpriteColor(Color.white);
-            mRigidbody2D.gravityScale = 0;
             UpdateControlPointManager();
         }
     }
@@ -155,9 +154,9 @@ public class ControlPoint : MonoBehaviour, IGameLoop
     private void OnDragExit()
     {
         bDragging = false;
+        mDragDistance = 0;
         MySprite.color = Color.white;
         mRigidbody2D.velocity = Vector2.zero;
-        mRigidbody2D.gravityScale = 0;
         UpdateControlPointManager();
     }
 
@@ -165,7 +164,6 @@ public class ControlPoint : MonoBehaviour, IGameLoop
     {
         if (bDrifting)
         {
-            OnDriftExit();
             OnDragEnter();            
         }
     }
@@ -175,20 +173,26 @@ public class ControlPoint : MonoBehaviour, IGameLoop
         if(bDragging)
         {
             Vector2 Delta = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
-            mRigidbody2D.velocity = Delta * 15;
-            //float ang = 10000.0f * Vector3.Cross(Vector3.right * Delta.x, Vector3.up * Delta.y).z;
-           // Debug.Log("before " + ang);
-           // mRigidbody2D.angularVelocity = ang;
-            //Debug.Log("after " + mRigidbody2D.angularVelocity);
+            mDragDistance += Delta.magnitude;
+            mRigidbody2D.velocity = Delta * DragSpeed;
         }
     }
 
     private void OnRelease()
     {
+        Debug.Log("Distance: " + mDragDistance);
         if (mRigidbody2D != null && bDragging)
         {
-            OnDragExit();        
+            if (mDragDistance >= MinDragDistance)
+            {
+                OnDragExit();
+            } 
+            else
+            {
+                OnDriftEnter();
+            }
         }
+        
     }  
 
     public void ResetNode()
@@ -201,7 +205,6 @@ public class ControlPoint : MonoBehaviour, IGameLoop
         {
             mRigidbody2D.velocity = Vector2.zero;
             mRigidbody2D.angularVelocity = 0;
-            mRigidbody2D.gravityScale = 0;
             mRigidbody2D.bodyType = RigidbodyType2D.Kinematic;
         }
         ChangeSpriteColor(Color.white);

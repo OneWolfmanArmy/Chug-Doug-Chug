@@ -24,11 +24,13 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
 
     private List<ControlPoint> mStableCP;
     private List<ControlPoint> mDriftingCP;
+    private ControlPoint mPreviousCP;
     
     public void OnGameBegin()
     {
         mStableCP = new List<ControlPoint>(ControlPoints);
         mDriftingCP = new List<ControlPoint>(ControlPoints.Length);
+        mPreviousCP = null;
         mDifficulty = Difficulties[0];
         mDifficultyLevel = 1;
         for(int i = 0; i < ControlPoints.Length; i++)
@@ -77,6 +79,11 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
 
     private void SelectNextDrifter()
     {
+        if (mPreviousCP != null)
+        {
+            mStableCP.Remove(mPreviousCP);
+        }
+
         ControlPoint ToDriftCP;
         if (DebugCP == null)
         {
@@ -87,8 +94,12 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
         {
             ToDriftCP = DebugCP;
         }
-
         mStableCP.Remove(ToDriftCP);
+
+        if (mPreviousCP != null)
+        {
+            mStableCP.Add(mPreviousCP);
+        }
 
         int index;
         for(index = 0; index < mDriftingCP.Count; index++)
@@ -120,6 +131,7 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
         if (mDriftingCP.Contains(ToStableCP))
         {
             mDriftingCP.Remove(ToStableCP);
+            mPreviousCP = ToStableCP;
             mStableCP.Add(ToStableCP);
             
             for(int i = 0; i < ControlPoints.Length; i++)
