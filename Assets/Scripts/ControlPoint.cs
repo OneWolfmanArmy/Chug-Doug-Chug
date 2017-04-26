@@ -7,6 +7,7 @@ public class ControlPoint : MonoBehaviour, IGameLoop
     #region Editor
 
     public SpriteRenderer MySprite;
+    public bool Draggable;
     public float Influence;
     public float StartRotation;
     public float MinDriftSpeed;
@@ -39,9 +40,9 @@ public class ControlPoint : MonoBehaviour, IGameLoop
 
     // Use this for initialization
     void Start()
-    {       
+    {
         mRigidbody2D = GetComponent<Rigidbody2D>();
-        mRigidbody2D.bodyType = RigidbodyType2D.Kinematic;
+        mRigidbody2D.bodyType = Draggable ? RigidbodyType2D.Dynamic : RigidbodyType2D.Kinematic;
 
         OriginalPos = transform.localPosition;
         OriginalRot = Quaternion.Euler(StartRotation * Vector3.forward);
@@ -141,12 +142,13 @@ public class ControlPoint : MonoBehaviour, IGameLoop
         {
             bDrifting = false;
             ChangeSpriteColor(Color.white);
-            UpdateControlPointManager();
+            //UpdateControlPointManager();
         }
     }
 
     private void OnDragEnter()
     {
+        OnDriftExit();
         bDragging = true;
         ChangeSpriteColor(Color.blue);
     }
@@ -155,14 +157,19 @@ public class ControlPoint : MonoBehaviour, IGameLoop
     {
         bDragging = false;
         mDragDistance = 0;
-        MySprite.color = Color.white;
+        MySprite.color = Color.white;       
         mRigidbody2D.velocity = Vector2.zero;
         UpdateControlPointManager();
+        /*if (UpdateControlPointManager != null)
+        {
+            Debug.Log("hi");
+            UpdateControlPointManager();
+        }*/
     }
 
     private void OnSelect()
     {
-        if (bDrifting)
+        if (bDrifting || Draggable)
         {
             OnDragEnter();            
         }
@@ -180,7 +187,6 @@ public class ControlPoint : MonoBehaviour, IGameLoop
 
     private void OnRelease()
     {
-        Debug.Log("Distance: " + mDragDistance);
         if (mRigidbody2D != null && bDragging)
         {
             if (mDragDistance >= MinDragDistance)
