@@ -93,7 +93,10 @@ public class ControlPoint : MonoBehaviour, IGameLoop
 
     public void OnFrame()
     {
-        
+        if(bDrifting)
+        {
+            mDriftTime += Time.deltaTime;
+        }
     }
 
     #endregion
@@ -113,6 +116,7 @@ public class ControlPoint : MonoBehaviour, IGameLoop
     public void Destabilize(System.Action Callback, float Delay, float MaxTime)
     {
         UpdateControlPointManager = Callback;
+        //OnDriftEnter();
         Invoke("OnDriftEnter", Delay);
         Invoke("OnDriftExit", Delay + MaxTime);
     }
@@ -142,7 +146,6 @@ public class ControlPoint : MonoBehaviour, IGameLoop
         {
             bDrifting = false;
             ChangeSpriteColor(Color.white);
-            //UpdateControlPointManager();
         }
     }
 
@@ -159,12 +162,10 @@ public class ControlPoint : MonoBehaviour, IGameLoop
         mDragDistance = 0;
         MySprite.color = Color.white;       
         mRigidbody2D.velocity = Vector2.zero;
-        UpdateControlPointManager();
-        /*if (UpdateControlPointManager != null)
+        if (UpdateControlPointManager != null)
         {
-            Debug.Log("hi");
             UpdateControlPointManager();
-        }*/
+        }
     }
 
     private void OnSelect()
@@ -211,7 +212,10 @@ public class ControlPoint : MonoBehaviour, IGameLoop
         {
             mRigidbody2D.velocity = Vector2.zero;
             mRigidbody2D.angularVelocity = 0;
-            mRigidbody2D.bodyType = RigidbodyType2D.Kinematic;
+            if (!Draggable)
+            {
+                mRigidbody2D.bodyType = RigidbodyType2D.Kinematic;
+            }
         }
         ChangeSpriteColor(Color.white);
     }

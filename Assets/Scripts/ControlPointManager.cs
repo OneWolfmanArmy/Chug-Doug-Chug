@@ -38,6 +38,11 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
             if (ControlPoints[i].gameObject != null)
             {
                 ControlPoints[i].OnGameBegin();
+                if(ControlPoints[i].Draggable)
+                {
+                    mStableCP.Remove(ControlPoints[i]);
+                    AddInfluence(ControlPoints[i]);
+                }
             }
         }
     }
@@ -74,6 +79,42 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
             {
                 ControlPoints[i].ResetNode();
             }
+        }
+    }
+
+    private void AddInfluence(ControlPoint CP)
+    {
+        for (int i = 0; i < mStableCP.Count; i++)
+        {
+            if (mStableCP[i].Influence <= CP.Influence)
+            {
+                mStableCP[i].SetRigidBodyType(RigidbodyType2D.Dynamic);
+            }
+        }
+    }
+
+    private void RemoveInfluence(ControlPoint CP)
+    {
+        for (int i = 0; i < mStableCP.Count; i++)
+        {
+            if (mDriftingCP.Count == 0 || mStableCP[i].Influence >= mDriftingCP[0].Influence)
+            {
+                mStableCP[i].GetComponent<Rigidbody2D>().velocity = Vector3.zero;
+                mStableCP[i].GetComponent<Rigidbody2D>().angularVelocity = 0;
+                mStableCP[i].SetRigidBodyType(RigidbodyType2D.Kinematic);
+            }
+        }
+    }
+
+    void RemoveFromDriftingList(ControlPoint ToStableCP)
+    {
+        if (mDriftingCP.Contains(ToStableCP))
+        {
+            mDriftingCP.Remove(ToStableCP);
+            mPreviousCP = ToStableCP;
+            mStableCP.Add(ToStableCP);
+
+            RemoveInfluence(ToStableCP);
         }
     }
 
@@ -116,35 +157,10 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
             RemoveFromDriftingList(ToDriftCP);
         }        
         , RandomDelay, mDifficulty.MaxDriftTime);
-        
-        for (int i = 0; i < mStableCP.Count; i++)
-        {
-            if (mStableCP[i].Influence <= ToDriftCP.Influence)
-            {
-                mStableCP[i].SetRigidBodyType(RigidbodyType2D.Dynamic);
-            }
-        }
+
+        AddInfluence(ToDriftCP);
     }
 
-    void RemoveFromDriftingList(ControlPoint ToStableCP)
-    {
-        if (mDriftingCP.Contains(ToStableCP))
-        {
-            mDriftingCP.Remove(ToStableCP);
-            mPreviousCP = ToStableCP;
-            mStableCP.Add(ToStableCP);
-            
-            for(int i = 0; i < ControlPoints.Length; i++)
-            {
-                if (mDriftingCP.Count == 0 || ControlPoints[i].Influence >= mDriftingCP[0].Influence)
-                {
-                    ControlPoints[i].GetComponent<Rigidbody2D>().velocity = Vector3.zero;
-                    ControlPoints[i].GetComponent<Rigidbody2D>().angularVelocity = 0;
-                    ControlPoints[i].SetRigidBodyType(RigidbodyType2D.Kinematic);
-                }
-            }
-        }
-
-    }
+    
 
 }
