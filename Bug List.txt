@@ -1,0 +1,10 @@
+Current Bug List:
+
+1. If you don't move a body part in time, no other body part will turn red again.
+
+2. After two games the drunk bar will go negative instead of up. This causes the cred bar to decrease even when drinking.
+
+
+
+
+
