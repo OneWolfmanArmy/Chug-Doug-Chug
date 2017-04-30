@@ -29,7 +29,16 @@ public class Doug : MonoBehaviour, IGameLoop
         if(DrinkingDistance())
         {
             ScoreBoard.IncrementIntoxication();
+            ScoreBoard.IncrementCred();
+            ScoreBoard.IncrementScore(ScoreBoard.DrinkScoreMultiplier);
         }
+        else
+        {
+            ScoreBoard.DecrementIntoxication();
+            ScoreBoard.DecrementStreetCred();
+        }
+
+        ScoreBoard.OnFrame();
     }
 
     private bool DrinkingDistance()

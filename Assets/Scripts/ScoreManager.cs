@@ -8,16 +8,18 @@ public class ScoreManager : MonoBehaviour, IGameLoop
 
     public UIManager ScoreUI;
 
-    public float DrinkMultiplier;
+    public float DrinkScoreMultiplier;
     public float IntoxicationRate;
-    public float StreetCredRate;
+    public float SoberRate;
+    public float CredGainRate;
+    public float CredLoseRate;
        
     private const float FATAL_INTOXICATION = 1.0f;
     private const float FATAL_STREETCRED = 0.0f;
 
-    private int mScore;
+    private float mScore;
     private float mIntoxication;
-    private float mStreetCred;
+    private float mCred;
 
     #endregion
 
@@ -28,21 +30,25 @@ public class ScoreManager : MonoBehaviour, IGameLoop
     {
         mScore = 0;
         mIntoxication = 0.0f;        
-        mStreetCred = .5f;
+        mCred = .5f;
 
-        SynchronizeUI();
+        ScoreUI.SetScoreMetrics(mScore, mIntoxication, mCred);
     }
 
-    public void OnFrame(){}
+    public void OnFrame()
+    {
+        ScoreUI.SetScoreMetrics(mScore, mIntoxication, mCred);
+    }
 
     #endregion
         
 
     #region Public Methods
 
-    public void IncrementScore(int Points)
+    public void IncrementScore(float Points)
     {
-        mScore += Points;
+        mScore += Points * Time.deltaTime;
+        ScoreUI.UpdateScoreText(mScore);
     }
 
     public void IncrementIntoxication()
@@ -50,48 +56,34 @@ public class ScoreManager : MonoBehaviour, IGameLoop
         mIntoxication += IntoxicationRate * Time.deltaTime;
         if (mIntoxication >= FATAL_INTOXICATION)
         {
-            ScoreUI.UpdateIntoxicationBar(FATAL_INTOXICATION);
             FinalizeScore();
-        }
-        else
-        {
-            ScoreUI.UpdateIntoxicationBar(mIntoxication);
         }
     }
 
-    public void IncrementStreetCred()
+    public void IncrementCred()
     {
-        mStreetCred += StreetCredRate * Time.deltaTime;
+        mCred += CredGainRate * Time.deltaTime;
     }
 
     public void DecrementIntoxication()
     {
-        mIntoxication -= IntoxicationRate * Time.deltaTime;
+        mIntoxication -= SoberRate * Time.deltaTime;
     }
 
     public void DecrementStreetCred()
     {
-        mStreetCred -= StreetCredRate * Time.deltaTime;
-        if(mStreetCred <= FATAL_STREETCRED)
+        mCred -= CredLoseRate * Time.deltaTime;
+        if(mCred <= FATAL_STREETCRED)
         {
-            ScoreUI.UpdateIntoxicationBar(FATAL_STREETCRED);
+            ScoreUI.UpdateCredBar(FATAL_STREETCRED);
             FinalizeScore();
         }
-        else
-        {
-            ScoreUI.UpdateIntoxicationBar(mStreetCred);
-        }   
     }
 
     #endregion
 
 
     #region Private Methods
-
-    private void SynchronizeUI()
-    {
-        ScoreUI.SetScoreMetrics(mScore, mIntoxication, mStreetCred);
-    }
 
     private void FinalizeScore()
     {

@@ -7,6 +7,7 @@ public class ControlPoint : MonoBehaviour, IGameLoop
     #region Editor
 
     public SpriteRenderer MySprite;
+    public Collider2D DragCollider;
     public bool Draggable;
     public float Influence;
     public float StartRotation;
@@ -24,7 +25,6 @@ public class ControlPoint : MonoBehaviour, IGameLoop
 
     private Vector3 OriginalPos;
     private Quaternion OriginalRot;
-    private Vector3 OriginalScale;
     
     private bool bDrifting;
     private float mDriftTime;
@@ -47,7 +47,6 @@ public class ControlPoint : MonoBehaviour, IGameLoop
         OriginalPos = transform.localPosition;
         OriginalRot = Quaternion.Euler(StartRotation * Vector3.forward);
     }
-
 
     /* void OnDrawGizmos()
      {
@@ -116,7 +115,6 @@ public class ControlPoint : MonoBehaviour, IGameLoop
     public void Destabilize(System.Action Callback, float Delay, float MaxTime)
     {
         UpdateControlPointManager = Callback;
-        //OnDriftEnter();
         Invoke("OnDriftEnter", Delay);
         Invoke("OnDriftExit", Delay + MaxTime);
     }
@@ -134,10 +132,12 @@ public class ControlPoint : MonoBehaviour, IGameLoop
         
         if (Mathf.Abs(mRigidbody2D.centerOfMass.x) <= .05f)
         {
-            mRigidbody2D.angularVelocity = 10f * Mathf.Pow(-1, Random.Range(0, 2));
+            mRigidbody2D.angularVelocity = 20.0f * Mathf.Pow(-1, Random.Range(0, 2));
         }
 
         ChangeSpriteColor(Color.red);
+
+        DragCollider.enabled = true;
     }
 
     private void OnDriftExit()
@@ -162,6 +162,10 @@ public class ControlPoint : MonoBehaviour, IGameLoop
         mDragDistance = 0;
         MySprite.color = Color.white;       
         mRigidbody2D.velocity = Vector2.zero;
+        if (!Draggable)
+        {
+            DragCollider.enabled = false;
+        }
         if (UpdateControlPointManager != null)
         {
             UpdateControlPointManager();
@@ -198,8 +202,7 @@ public class ControlPoint : MonoBehaviour, IGameLoop
             {
                 OnDriftEnter();
             }
-        }
-        
+        }        
     }  
 
     public void ResetNode()
@@ -215,6 +218,7 @@ public class ControlPoint : MonoBehaviour, IGameLoop
             if (!Draggable)
             {
                 mRigidbody2D.bodyType = RigidbodyType2D.Kinematic;
+                DragCollider.enabled = false;
             }
         }
         ChangeSpriteColor(Color.white);
@@ -228,6 +232,5 @@ public class ControlPoint : MonoBehaviour, IGameLoop
         }
     }
 
-    #endregion
-    
+    #endregion    
 }
