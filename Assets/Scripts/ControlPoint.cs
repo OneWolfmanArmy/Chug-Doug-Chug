@@ -37,17 +37,7 @@ public class ControlPoint : MonoBehaviour, IGameLoop
 
 
     #region MonoBehavior
-
-    // Use this for initialization
-    void Start()
-    {
-        mRigidbody2D = GetComponent<Rigidbody2D>();
-        mRigidbody2D.bodyType = Draggable ? RigidbodyType2D.Dynamic : RigidbodyType2D.Kinematic;
-
-        OriginalPos = transform.localPosition;
-        OriginalRot = Quaternion.Euler(StartRotation * Vector3.forward);
-    }
-
+    
     /* void OnDrawGizmos()
      {
          UnityEditor.Handles.color = Color.blue;
@@ -82,12 +72,18 @@ public class ControlPoint : MonoBehaviour, IGameLoop
 
     #region IGameLoop
 
+    public void OnCreate()
+    {
+        mRigidbody2D = GetComponent<Rigidbody2D>();
+        mRigidbody2D.bodyType = Draggable ? RigidbodyType2D.Dynamic : RigidbodyType2D.Kinematic;
+
+        OriginalPos = transform.localPosition;
+        OriginalRot = Quaternion.Euler(StartRotation * Vector3.forward);
+    }
+
     public void OnGameBegin()
     {
-        if (mRigidbody2D != null)
-        {
-            ResetNode();
-        }
+        ResetNode();        
     }
 
     public void OnFrame()

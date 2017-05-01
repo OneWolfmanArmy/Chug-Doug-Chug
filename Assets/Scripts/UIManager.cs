@@ -26,6 +26,11 @@ public class UIManager : MonoBehaviour, IGameLoop
 
     #region IGameLoop
 
+    public void OnCreate()
+    {
+        
+    }
+
     public void OnGameBegin()
     {
         PauseButton.gameObject.SetActive(true);

@@ -14,12 +14,17 @@ public class Doug : MonoBehaviour, IGameLoop
 
     private bool bDrinking;
 
+    public void OnCreate()
+    {
+        MinDrinkingDistance *= MinDrinkingDistance;
+        ScoreBoard.OnCreate();
+        CPManager.OnCreate();
+    }
+
     public void OnGameBegin()
     {
         ScoreBoard.OnGameBegin();
-        CPManager.OnGameBegin();
-
-        MinDrinkingDistance *= MinDrinkingDistance;
+        CPManager.OnGameBegin();       
     }    
 
     public void OnFrame()

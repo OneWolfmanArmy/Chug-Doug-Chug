@@ -19,7 +19,9 @@ public class GameState : MonoBehaviour, IGameLoop
     private enum State {Default, MainMenu, Tutorial, Playing, Paused, InGameMenu, GameOver};
     private State mState;
     private bool bCanUpdate = false;
-    
+
+    //private AsyncOperation asyncLoadLevel;
+
     private Doug mDoug;
     private UIManager mUIManager;
 
@@ -54,6 +56,12 @@ public class GameState : MonoBehaviour, IGameLoop
 
 
     #region IGameLoop
+
+    public void OnCreate()
+    {
+        mDoug.OnCreate();
+        mUIManager.OnCreate();
+    }
 
     public void OnGameBegin()
     {
@@ -103,6 +111,25 @@ public class GameState : MonoBehaviour, IGameLoop
         EnterState(State.MainMenu);
     }
 
+    IEnumerator LoadMainMenuScene()
+    {
+        AsyncOperation asyncLoadLevel = SceneManager.LoadSceneAsync(MainMenuSceneName, LoadSceneMode.Single);
+
+        yield return null;
+    }
+
+    IEnumerator LoadGameScene()
+    {
+        SceneManager.LoadScene(GameSceneName);
+        
+        
+        yield return null;
+
+        mDoug = GameObject.Find("Doug").GetComponent<Doug>();
+        mUIManager = GameObject.Find("Canvases").GetComponent<UIManager>();
+        OnCreate();
+    }
+
     #endregion
 
 
@@ -119,10 +146,14 @@ public class GameState : MonoBehaviour, IGameLoop
         switch (EntryState)
         {
             case State.MainMenu:
-                SceneManager.LoadScene(MainMenuSceneName);
+                LoadMainMenuScene();
+               // SceneManager.LoadScene(MainMenuSceneName);
                 break;
             case State.Tutorial:
-                SceneManager.LoadScene(GameSceneName);
+                StartCoroutine(LoadGameScene());
+                //SceneManager.LoadScene(GameSceneName);
+                
+                
                 break;
             case State.Playing:
                 break;
@@ -150,8 +181,6 @@ public class GameState : MonoBehaviour, IGameLoop
             case State.MainMenu:
                 break;
             case State.Tutorial:
-                mDoug = GameObject.Find("Doug").GetComponent<Doug>();
-                mUIManager = GameObject.Find("Canvases").GetComponent<UIManager>();
                 OnGameBegin();
                 break;
             case State.Playing:

@@ -25,7 +25,23 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
     private List<ControlPoint> mStableCP;
     private List<ControlPoint> mDriftingCP;
     private ControlPoint mPreviousCP;
-    
+
+
+    #region IGameLoop
+
+    public void OnCreate()
+    {
+        for (int i = 0; i < ControlPoints.Length; i++)
+        {
+            if (ControlPoints[i] != null)
+            {
+                ControlPoints[i].OnCreate();
+            }
+        }
+
+        ResetControlNodes();
+    }
+
     public void OnGameBegin()
     {
         mStableCP = new List<ControlPoint>(ControlPoints);
@@ -33,15 +49,19 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
         mPreviousCP = null;
         mDifficulty = Difficulties[0];
         mDifficultyLevel = 1;
-        for(int i = 0; i < ControlPoints.Length; i++)
+
+        ResetControlNodes();
+
+        for (int i = 0; i < ControlPoints.Length; i++)
         {
-            if (ControlPoints[i].gameObject != null)
+            if (ControlPoints[i] != null)
             {
                 ControlPoints[i].OnGameBegin();
-                if(ControlPoints[i].Draggable)
+                if (ControlPoints[i].Draggable)
                 {
-                    mStableCP.Remove(ControlPoints[i]);
+                    //ControlPoints[i].SetRigidBodyType(RigidbodyType2D.Dynamic);
                     AddInfluence(ControlPoints[i]);
+                    mStableCP.Remove(ControlPoints[i]);
                 }
             }
         }
@@ -61,6 +81,8 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
             }
         }*/
     }
+
+    #endregion
 
     public void IncreaseDifficulty()
     {

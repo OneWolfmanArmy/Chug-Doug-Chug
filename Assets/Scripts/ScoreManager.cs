@@ -26,6 +26,11 @@ public class ScoreManager : MonoBehaviour, IGameLoop
 
     #region IGameLoop
 
+    public void OnCreate()
+    {
+
+    }
+
     public void OnGameBegin()
     {
         mScore = 0;
@@ -62,12 +67,12 @@ public class ScoreManager : MonoBehaviour, IGameLoop
 
     public void IncrementCred()
     {
-        mCred += CredGainRate * Time.deltaTime;
+        mCred = Mathf.Min(1.0f, mCred + CredGainRate * Time.deltaTime);
     }
 
     public void DecrementIntoxication()
     {
-        mIntoxication -= SoberRate * Time.deltaTime;
+        mIntoxication = Mathf.Max(0, mIntoxication - SoberRate * Time.deltaTime);
     }
 
     public void DecrementStreetCred()
