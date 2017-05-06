@@ -36,15 +36,7 @@ public class ControlPoint : MonoBehaviour, IGameLoop
     #endregion
 
 
-    #region MonoBehavior
-    
-    /* void OnDrawGizmos()
-     {
-         UnityEditor.Handles.color = Color.blue;
-         UnityEditor.Handles.DrawWireDisc(transform.position, Vector3.forward, NodeRadius);
-         //UnityEditor.Handles.color = Color.yellow;
-         //UnityEditor.Handles.DrawWireDisc(Target.transform.position, Vector3.forward, NodeRadius);
-     }*/
+    #region MonoBehavior    
 
     void OnMouseOver()
     {
@@ -75,10 +67,12 @@ public class ControlPoint : MonoBehaviour, IGameLoop
     public void OnCreate()
     {
         mRigidbody2D = GetComponent<Rigidbody2D>();
-        mRigidbody2D.bodyType = Draggable ? RigidbodyType2D.Dynamic : RigidbodyType2D.Kinematic;
+        mRigidbody2D.bodyType = RigidbodyType2D.Kinematic;
 
         OriginalPos = transform.localPosition;
         OriginalRot = Quaternion.Euler(StartRotation * Vector3.forward);
+        
+        DragCollider.enabled = false;        
     }
 
     public void OnGameBegin()
@@ -216,6 +210,11 @@ public class ControlPoint : MonoBehaviour, IGameLoop
                 mRigidbody2D.bodyType = RigidbodyType2D.Kinematic;
                 DragCollider.enabled = false;
             }
+           /* else
+            {
+                mRigidbody2D.bodyType = RigidbodyType2D.Dynamic;
+                DragCollider.enabled = true;
+            }*/
         }
         ChangeSpriteColor(Color.white);
     }

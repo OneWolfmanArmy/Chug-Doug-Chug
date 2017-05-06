@@ -28,7 +28,6 @@ public class ScoreManager : MonoBehaviour, IGameLoop
 
     public void OnCreate()
     {
-
     }
 
     public void OnGameBegin()

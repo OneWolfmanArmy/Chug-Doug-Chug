@@ -46,7 +46,7 @@ public class Doug : MonoBehaviour, IGameLoop
         ScoreBoard.OnFrame();
     }
 
-    private bool DrinkingDistance()
+    public bool DrinkingDistance()
     {
         return Vector2.SqrMagnitude(BeerDst.position - BeerSrc.position) <= MinDrinkingDistance;
     }

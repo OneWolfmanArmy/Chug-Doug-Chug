@@ -28,7 +28,7 @@ public class UIManager : MonoBehaviour, IGameLoop
 
     public void OnCreate()
     {
-        
+        ScoreText.text = "";
     }
 
     public void OnGameBegin()

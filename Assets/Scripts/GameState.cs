@@ -20,8 +20,7 @@ public class GameState : MonoBehaviour, IGameLoop
     private State mState;
     private bool bCanUpdate = false;
 
-    //private AsyncOperation asyncLoadLevel;
-
+    private Tutorial mTutorial;
     private Doug mDoug;
     private UIManager mUIManager;
 
@@ -113,21 +112,23 @@ public class GameState : MonoBehaviour, IGameLoop
 
     IEnumerator LoadMainMenuScene()
     {
-        AsyncOperation asyncLoadLevel = SceneManager.LoadSceneAsync(MainMenuSceneName, LoadSceneMode.Single);
+        SceneManager.LoadScene(MainMenuSceneName);
 
         yield return null;
     }
 
     IEnumerator LoadGameScene()
     {
-        SceneManager.LoadScene(GameSceneName);
-        
+        SceneManager.LoadScene(GameSceneName);  
         
         yield return null;
 
-        mDoug = GameObject.Find("Doug").GetComponent<Doug>();
+        mDoug = GameObject.Find("Game/Doug").GetComponent<Doug>();
         mUIManager = GameObject.Find("Canvases").GetComponent<UIManager>();
         OnCreate();
+
+        mTutorial = GameObject.Find("Tutorial").GetComponent<Tutorial>();
+        mTutorial.BeginTutorial();
     }
 
     #endregion
@@ -147,13 +148,9 @@ public class GameState : MonoBehaviour, IGameLoop
         {
             case State.MainMenu:
                 LoadMainMenuScene();
-               // SceneManager.LoadScene(MainMenuSceneName);
                 break;
             case State.Tutorial:
-                StartCoroutine(LoadGameScene());
-                //SceneManager.LoadScene(GameSceneName);
-                
-                
+                StartCoroutine(LoadGameScene());         
                 break;
             case State.Playing:
                 break;

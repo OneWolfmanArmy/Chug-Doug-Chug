@@ -31,6 +31,9 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
 
     public void OnCreate()
     {
+        mStableCP = new List<ControlPoint>(ControlPoints);
+        mDriftingCP = new List<ControlPoint>(ControlPoints.Length);
+
         for (int i = 0; i < ControlPoints.Length; i++)
         {
             if (ControlPoints[i] != null)
@@ -104,19 +107,21 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
         }
     }
 
-    private void AddInfluence(ControlPoint CP)
+    public void AddInfluence(ControlPoint CP)
     {
+        CP.DragCollider.enabled = true;
         for (int i = 0; i < mStableCP.Count; i++)
         {
-            if (mStableCP[i].Influence <= CP.Influence)
+            if ( mStableCP[i].Influence <= CP.Influence)
             {
                 mStableCP[i].SetRigidBodyType(RigidbodyType2D.Dynamic);
             }
         }
     }
 
-    private void RemoveInfluence(ControlPoint CP)
+    public void RemoveInfluence(ControlPoint CP)
     {
+        CP.DragCollider.enabled = false;
         for (int i = 0; i < mStableCP.Count; i++)
         {
             if (mDriftingCP.Count == 0 || mStableCP[i].Influence >= mDriftingCP[0].Influence)
