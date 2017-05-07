@@ -5,6 +5,8 @@ public class UIManager : MonoBehaviour, IGameLoop
 {
     #region Editor
 
+    public static int CanvasWidth = 675;
+
     public Canvas BGCanvas;
     public Canvas UICanvas;
     public Canvas FGCanvas;

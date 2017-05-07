@@ -174,7 +174,7 @@ public class ControlPoint : MonoBehaviour, IGameLoop
     {
         if(bDragging)
         {
-            Vector2 Delta = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
+            Vector2 Delta = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y")) * UIManager.CanvasWidth/Screen.width;
             mDragDistance += Delta.magnitude;
             mRigidbody2D.velocity = Delta * DragSpeed;
         }
