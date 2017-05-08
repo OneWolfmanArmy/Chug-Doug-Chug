@@ -38,7 +38,17 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
         {
             if (ControlPoints[i] != null)
             {
-                ControlPoints[i].OnCreate();
+                ControlPoint CP = ControlPoints[i];
+                CP.OnCreate();
+                CP.SetCallbacks
+                (() =>
+                {
+                    AddInfluence(CP);
+                },
+                () =>
+                {
+                    RemoveFromDriftingList(CP);
+                });                
             }
         }
 
@@ -109,7 +119,7 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
 
     public void AddInfluence(ControlPoint CP)
     {
-        CP.DragCollider.enabled = true;
+        //CP.DragCollider.enabled = true;
         for (int i = 0; i < mStableCP.Count; i++)
         {
             if ( mStableCP[i].Influence <= CP.Influence)
@@ -121,7 +131,10 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
 
     public void RemoveInfluence(ControlPoint CP)
     {
-        CP.DragCollider.enabled = false;
+        //CP.DragCollider.enabled = false;
+        CP.GetComponent<Rigidbody2D>().velocity = Vector3.zero;
+        CP.GetComponent<Rigidbody2D>().angularVelocity = 0;
+        CP.SetRigidBodyType(RigidbodyType2D.Kinematic);
         for (int i = 0; i < mStableCP.Count; i++)
         {
             if (mDriftingCP.Count == 0 || mStableCP[i].Influence >= mDriftingCP[0].Influence)
@@ -140,9 +153,9 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
             mDriftingCP.Remove(ToStableCP);
             mPreviousCP = ToStableCP;
             mStableCP.Add(ToStableCP);
-
-            RemoveInfluence(ToStableCP);
+            ToStableCP.DragCollider.enabled = false;
         }
+        RemoveInfluence(ToStableCP);
     }
 
     private void SelectNextDrifter()
@@ -180,12 +193,7 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
         mDriftingCP.Insert(index, ToDriftCP);
 
         float RandomDelay = Random.Range(mDifficulty.MinDriftDelay, mDifficulty.MaxDriftDelay);
-        ToDriftCP.Destabilize(() => {
-            RemoveFromDriftingList(ToDriftCP);
-        }        
-        , RandomDelay, mDifficulty.MaxDriftTime);
-
-        AddInfluence(ToDriftCP);
+        ToDriftCP.Destabilize(RandomDelay, mDifficulty.MaxDriftTime);
     }
 
     

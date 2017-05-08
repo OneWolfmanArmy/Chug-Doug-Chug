@@ -31,7 +31,8 @@ public class ControlPoint : MonoBehaviour, IGameLoop
     private bool bDragging;
     private float mDragDistance;
 
-    private System.Action UpdateControlPointManager;
+    private System.Action mSelectCallback;
+    private System.Action mReleaseCallback;
 
     #endregion
 
@@ -72,7 +73,7 @@ public class ControlPoint : MonoBehaviour, IGameLoop
         OriginalPos = transform.localPosition;
         OriginalRot = Quaternion.Euler(StartRotation * Vector3.forward);
         
-        DragCollider.enabled = false;        
+        DragCollider.enabled = Draggable;     
     }
 
     public void OnGameBegin()
@@ -92,7 +93,12 @@ public class ControlPoint : MonoBehaviour, IGameLoop
 
 
     #region Public Class Methods
-
+    
+    public void SetCallbacks(System.Action Select, System.Action Release)
+    {
+        mSelectCallback = Select;
+        mReleaseCallback = Release;
+    }
 
     public void SetRigidBodyType(RigidbodyType2D Type)
     {
@@ -102,9 +108,8 @@ public class ControlPoint : MonoBehaviour, IGameLoop
         }
     }    
 
-    public void Destabilize(System.Action Callback, float Delay, float MaxTime)
+    public void Destabilize(float Delay, float MaxTime)
     {
-        UpdateControlPointManager = Callback;
         Invoke("OnDriftEnter", Delay);
         Invoke("OnDriftExit", Delay + MaxTime);
     }
@@ -128,6 +133,11 @@ public class ControlPoint : MonoBehaviour, IGameLoop
         ChangeSpriteColor(Color.red);
 
         DragCollider.enabled = true;
+
+        if (mSelectCallback != null)
+        {
+            mSelectCallback();
+        }
     }
 
     private void OnDriftExit()
@@ -141,8 +151,21 @@ public class ControlPoint : MonoBehaviour, IGameLoop
 
     private void OnDragEnter()
     {
-        OnDriftExit();
         bDragging = true;
+        if (Draggable)
+        {
+            mRigidbody2D.bodyType = RigidbodyType2D.Dynamic;
+
+            if (mSelectCallback != null)
+            {
+                mSelectCallback();
+            }
+        }
+        else
+        {
+            OnDriftExit();
+        }
+        
         ChangeSpriteColor(Color.blue);
     }
 
@@ -156,9 +179,9 @@ public class ControlPoint : MonoBehaviour, IGameLoop
         {
             DragCollider.enabled = false;
         }
-        if (UpdateControlPointManager != null)
+        if (mReleaseCallback != null)
         {
-            UpdateControlPointManager();
+            mReleaseCallback();
         }
     }
 

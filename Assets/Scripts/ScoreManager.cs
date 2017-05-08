@@ -8,6 +8,8 @@ public class ScoreManager : MonoBehaviour, IGameLoop
 
     public UIManager ScoreUI;
 
+    public bool Sandbox;
+
     public float DrinkScoreMultiplier;
     public float IntoxicationRate;
     public float SoberRate;
@@ -41,7 +43,15 @@ public class ScoreManager : MonoBehaviour, IGameLoop
 
     public void OnFrame()
     {
-        ScoreUI.SetScoreMetrics(mScore, mIntoxication, mCred);
+        if (!Sandbox)
+        {
+            ScoreUI.SetScoreMetrics(mScore, mIntoxication, mCred);
+        }
+        else
+        {
+            ScoreUI.SetScoreMetrics(mScore, 0, .5f);
+        }
+
     }
 
     #endregion
@@ -52,7 +62,6 @@ public class ScoreManager : MonoBehaviour, IGameLoop
     public void IncrementScore(float Points)
     {
         mScore += Points * Time.deltaTime;
-        ScoreUI.UpdateScoreText(mScore);
     }
 
     public void IncrementIntoxication()
