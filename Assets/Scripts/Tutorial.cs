@@ -72,14 +72,14 @@ public class Tutorial : MonoBehaviour
 
     public void PromptNozzleMovement(ControlPoint CP)
     {
-        DougScript.CPManager.AddInfluence(CP);
+       // DougScript.CPManager.AddInfluence(CP);
         StartCoroutine(WaitForStepCompletion(() => 
         {
             return DougScript.DrinkingDistance();
         }, 
         () =>
         {
-            DougScript.CPManager.RemoveInfluence(CP);
+            //DougScript.CPManager.RemoveInfluence(CP);
         }
         ));
     }

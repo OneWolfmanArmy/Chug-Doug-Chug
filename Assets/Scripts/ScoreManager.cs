@@ -10,14 +10,28 @@ public class ScoreManager : MonoBehaviour, IGameLoop
 
     public bool Sandbox;
 
+    public float InitialIntoxication;
+    public float InitialCred;
+
     public float DrinkScoreMultiplier;
     public float IntoxicationRate;
     public float SoberRate;
     public float CredGainRate;
-    public float CredLoseRate;
-       
+    public float CredLossRate;
+
+    #endregion
+
+
+    #region Properties
+
     private const float FATAL_INTOXICATION = 1.0f;
-    private const float FATAL_STREETCRED = 0.0f;
+    private const float FATAL_CRED = 0.0f;
+
+    private struct ScoreDifficulty
+    {
+        public int ScoreRequisite;
+    }
+    private ScoreDifficulty mDifficulty;
 
     private float mScore;
     private float mIntoxication;
@@ -29,35 +43,43 @@ public class ScoreManager : MonoBehaviour, IGameLoop
     #region IGameLoop
 
     public void OnCreate()
-    {
-    }
+    {}
 
     public void OnGameBegin()
     {
         mScore = 0;
-        mIntoxication = 0.0f;        
-        mCred = .5f;
+        mIntoxication = InitialIntoxication;        
+        mCred = InitialCred;
 
-        ScoreUI.SetScoreMetrics(mScore, mIntoxication, mCred);
+        UpdateScoreUI();
     }
 
     public void OnFrame()
     {
         if (!Sandbox)
         {
-            ScoreUI.SetScoreMetrics(mScore, mIntoxication, mCred);
+            UpdateScoreUI();
         }
         else
         {
-            ScoreUI.SetScoreMetrics(mScore, 0, .5f);
+            ScoreUI.SetScoreMetrics(mScore, InitialIntoxication, InitialCred);
         }
-
     }
 
     #endregion
         
 
     #region Public Methods
+
+    public void SetDifficulty(Doug.Difficulty Difficulty)
+    {
+        mDifficulty.ScoreRequisite = Difficulty.ScoreRequisite;
+    }
+
+    public bool CanIncreaseDifficulty()
+    {
+        return mScore >= mDifficulty.ScoreRequisite;
+    }
 
     public void IncrementScore(float Points)
     {
@@ -69,6 +91,7 @@ public class ScoreManager : MonoBehaviour, IGameLoop
         mIntoxication += IntoxicationRate * Time.deltaTime;
         if (mIntoxication >= FATAL_INTOXICATION)
         {
+            mIntoxication = FATAL_INTOXICATION;
             FinalizeScore();
         }
     }
@@ -83,12 +106,12 @@ public class ScoreManager : MonoBehaviour, IGameLoop
         mIntoxication = Mathf.Max(0, mIntoxication - SoberRate * Time.deltaTime);
     }
 
-    public void DecrementStreetCred()
+    public void DecrementCred()
     {
-        mCred -= CredLoseRate * Time.deltaTime;
-        if(mCred <= FATAL_STREETCRED)
+        mCred -= CredLossRate * Time.deltaTime;
+        if(mCred <= FATAL_CRED)
         {
-            ScoreUI.UpdateCredBar(FATAL_STREETCRED);
+            mCred = FATAL_CRED;
             FinalizeScore();
         }
     }
@@ -97,6 +120,11 @@ public class ScoreManager : MonoBehaviour, IGameLoop
 
 
     #region Private Methods
+
+    private void UpdateScoreUI()
+    {
+        ScoreUI.SetScoreMetrics(mScore, mIntoxication, mCred);
+    }
 
     private void FinalizeScore()
     {

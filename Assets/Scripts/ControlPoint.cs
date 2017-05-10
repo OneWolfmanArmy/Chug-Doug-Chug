@@ -15,6 +15,7 @@ public class ControlPoint : MonoBehaviour, IGameLoop
     public float MaxDriftSpeed;
     public float DragSpeed;
     public float MinDragDistance;
+    public ControlPoint[] Children;
 
     #endregion
 
@@ -100,24 +101,68 @@ public class ControlPoint : MonoBehaviour, IGameLoop
         mReleaseCallback = Release;
     }
 
-    public void SetRigidBodyType(RigidbodyType2D Type)
-    {
-        if (mRigidbody2D != null)
-        {
-            mRigidbody2D.bodyType = Type;
-        }
-    }    
-
     public void Destabilize(float Delay, float MaxTime)
     {
         Invoke("OnDriftEnter", Delay);
         Invoke("OnDriftExit", Delay + MaxTime);
     }
 
+    public bool IsMobile()
+    {
+        if (mRigidbody2D != null)
+        {
+            return mRigidbody2D.bodyType == RigidbodyType2D.Dynamic;
+        }
+        return false;
+    }
+
+    public void Mobilize()
+    {
+        if (mRigidbody2D != null)
+        {
+            mRigidbody2D.bodyType = RigidbodyType2D.Dynamic;
+        }
+    }
+
+    public void Immobilize()
+    {
+        if (mRigidbody2D != null)
+        {
+            mRigidbody2D.bodyType = RigidbodyType2D.Kinematic;
+            mRigidbody2D.velocity = Vector2.zero;
+            mRigidbody2D.angularVelocity = 0;
+            DisableDragCollider();
+        }
+    }
+
     #endregion
 
 
     #region Private Class Methods
+
+    private void EnableDragCollider()
+    {
+        if (DragCollider != null)
+        {
+            DragCollider.enabled = true;
+        }
+    }
+
+    private void DisableDragCollider()
+    {
+        if (DragCollider != null && !Draggable)
+        {
+            DragCollider.enabled = false;
+        }
+    }
+
+    private void SetSpriteColor(Color Col)
+    {
+        if (MySprite != null)
+        {
+            MySprite.color = Col;
+        }
+    }
 
     private void OnDriftEnter()
     {
@@ -130,9 +175,9 @@ public class ControlPoint : MonoBehaviour, IGameLoop
             mRigidbody2D.angularVelocity = 20.0f * Mathf.Pow(-1, Random.Range(0, 2));
         }
 
-        ChangeSpriteColor(Color.red);
+        SetSpriteColor(Color.red);
 
-        DragCollider.enabled = true;
+        EnableDragCollider();
 
         if (mSelectCallback != null)
         {
@@ -145,7 +190,7 @@ public class ControlPoint : MonoBehaviour, IGameLoop
         if (bDrifting)
         {
             bDrifting = false;
-            ChangeSpriteColor(Color.white);
+            SetSpriteColor(Color.white);
         }
     }
 
@@ -166,19 +211,16 @@ public class ControlPoint : MonoBehaviour, IGameLoop
             OnDriftExit();
         }
         
-        ChangeSpriteColor(Color.blue);
+        SetSpriteColor(Color.blue);
     }
 
     private void OnDragExit()
     {
         bDragging = false;
         mDragDistance = 0;
-        MySprite.color = Color.white;       
-        mRigidbody2D.velocity = Vector2.zero;
-        if (!Draggable)
-        {
-            DragCollider.enabled = false;
-        }
+        SetSpriteColor(Color.white);       
+        DisableDragCollider();
+
         if (mReleaseCallback != null)
         {
             mReleaseCallback();
@@ -205,7 +247,7 @@ public class ControlPoint : MonoBehaviour, IGameLoop
 
     private void OnRelease()
     {
-        if (mRigidbody2D != null && bDragging)
+        if (bDragging)
         {
             if (mDragDistance >= MinDragDistance)
             {
@@ -224,31 +266,12 @@ public class ControlPoint : MonoBehaviour, IGameLoop
         transform.localRotation = OriginalRot;
         bDrifting = false;
         bDragging = false;
-        if (mRigidbody2D != null)
-        {
-            mRigidbody2D.velocity = Vector2.zero;
-            mRigidbody2D.angularVelocity = 0;
-            if (!Draggable)
-            {
-                mRigidbody2D.bodyType = RigidbodyType2D.Kinematic;
-                DragCollider.enabled = false;
-            }
-           /* else
-            {
-                mRigidbody2D.bodyType = RigidbodyType2D.Dynamic;
-                DragCollider.enabled = true;
-            }*/
-        }
-        ChangeSpriteColor(Color.white);
+
+        Immobilize();     
+        DisableDragCollider();
+        SetSpriteColor(Color.white);
     }
 
-    private void ChangeSpriteColor(Color Col)
-    {
-        if (MySprite != null)
-        {
-            MySprite.color = Col;
-        }
-    }
 
     #endregion    
 }
