@@ -4,38 +4,77 @@ using UnityEngine;
 
 public class ControlPointManager : MonoBehaviour, IGameLoop
 {
+    #region Editor
+
+    public ControlPoint[] ControlPoints;
     public ControlPoint DebugCP;
 
-    [System.Serializable]
-    public struct Difficulty
+    #endregion
+
+
+    #region Properties
+
+    private struct CPDifficulty
     {
         public int MaxDriftCount;
         public float MinDriftDelay;
         public float MaxDriftDelay;
         public float MaxDriftTime;
     }
-    public Difficulty[] Difficulties;
-
-    public ControlPoint[] ControlPoints;
-
-    
-    private int mDifficultyLevel;
-    private Difficulty mDifficulty;
+    private CPDifficulty mDifficulty;
 
     private List<ControlPoint> mStableCP;
     private List<ControlPoint> mDriftingCP;
-    
+    private ControlPoint mPreviousCP;
+
+    #endregion
+
+
+    #region IGameLoop
+
+    public void OnCreate()
+    {
+        mStableCP = new List<ControlPoint>(ControlPoints);
+        mDriftingCP = new List<ControlPoint>(ControlPoints.Length);
+
+        for (int i = 0; i < ControlPoints.Length; i++)
+        {
+            if (ControlPoints[i] != null)
+            {
+                ControlPoint CP = ControlPoints[i];
+                CP.OnCreate();
+                CP.SetCallbacks
+                (() =>
+                {
+                    AddInfluence(CP);
+                },
+                () =>
+                {
+                    RemoveFromDriftingList(CP);
+                });                
+            }
+        }
+
+        ResetControlNodes();
+    }
+
     public void OnGameBegin()
     {
         mStableCP = new List<ControlPoint>(ControlPoints);
         mDriftingCP = new List<ControlPoint>(ControlPoints.Length);
-        mDifficulty = Difficulties[0];
-        mDifficultyLevel = 1;
-        for(int i = 0; i < ControlPoints.Length; i++)
+        mPreviousCP = null;
+
+        ResetControlNodes();
+
+        for (int i = 0; i < ControlPoints.Length; i++)
         {
-            if (ControlPoints[i].gameObject != null)
+            if (ControlPoints[i] != null)
             {
                 ControlPoints[i].OnGameBegin();
+                if (ControlPoints[i].Draggable)
+                {
+                    mStableCP.Remove(ControlPoints[i]);
+                }
             }
         }
     }
@@ -46,17 +85,33 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
         {
             SelectNextDrifter();
         }
-    }
-
-    public void IncreaseDifficulty()
-    {
-        if (DebugCP == null)
+        /*for (int i = 0; i < ControlPoints.Length; i++)
         {
-            mDifficulty = Difficulties[mDifficultyLevel];
-            mDifficultyLevel++;
-        }
+            if (ControlPoints[i].gameObject != null)
+            {
+                ControlPoints[i].OnFrame();
+            }
+        }*/
     }
 
+    #endregion
+
+
+    #region Public Methods
+
+    public void SetDifficulty(Doug.Difficulty Difficulty)
+    {
+        mDifficulty.MaxDriftCount = Difficulty.MaxDriftCount;
+        mDifficulty.MinDriftDelay = Difficulty.MinDriftDelay;
+        mDifficulty.MaxDriftDelay = Difficulty.MaxDriftDelay;
+        mDifficulty.MaxDriftTime = Difficulty.MaxDriftTime;
+    }
+
+    #endregion
+
+
+    #region Private Methods
+    
     private void ResetControlNodes()
     {
         for (int i = 0; i < ControlPoints.Length; i++)
@@ -68,8 +123,51 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
         }
     }
 
+    private void AddInfluence(ControlPoint CP)
+    {
+        CP.Mobilize();
+        for(int i = 0; i < CP.Children.Length; i++)
+        {
+            ControlPoint Next = CP.Children[i];
+            if (!Next.IsMobile())
+            {
+                AddInfluence(Next);
+            }
+        }
+    }
+
+    private void RemoveInfluence(ControlPoint CP)
+    {
+        CP.Immobilize();
+        for (int i = 0; i < CP.Children.Length; i++)
+        {
+            ControlPoint Next = CP.Children[i];
+            if (Next.IsMobile())
+            {
+                RemoveInfluence(Next);
+            }
+        }
+    }
+
+    private void RemoveFromDriftingList(ControlPoint ToStableCP)
+    {
+        if (mDriftingCP.Contains(ToStableCP))
+        {
+            mDriftingCP.Remove(ToStableCP);
+            mPreviousCP = ToStableCP;
+            mStableCP.Add(ToStableCP);
+            ToStableCP.DragCollider.enabled = false;
+        }
+        RemoveInfluence(ToStableCP);
+    }
+
     private void SelectNextDrifter()
     {
+        if (mPreviousCP != null)
+        {
+            mStableCP.Remove(mPreviousCP);
+        }
+
         ControlPoint ToDriftCP;
         if (DebugCP == null)
         {
@@ -80,8 +178,12 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
         {
             ToDriftCP = DebugCP;
         }
-
         mStableCP.Remove(ToDriftCP);
+
+        if (mPreviousCP != null)
+        {
+            mStableCP.Add(mPreviousCP);
+        }
 
         int index;
         for(index = 0; index < mDriftingCP.Count; index++)
@@ -94,38 +196,8 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
         mDriftingCP.Insert(index, ToDriftCP);
 
         float RandomDelay = Random.Range(mDifficulty.MinDriftDelay, mDifficulty.MaxDriftDelay);
-        ToDriftCP.Destabilize(() => {
-            RemoveFromDriftingList(ToDriftCP);
-        }        
-        , RandomDelay, mDifficulty.MaxDriftTime);
-        
-        for (int i = 0; i < mStableCP.Count; i++)
-        {
-            if (mStableCP[i].Influence < ToDriftCP.Influence)
-            {
-                mStableCP[i].SetRigidBodyType(RigidbodyType2D.Dynamic);
-            }
-        }
+        ToDriftCP.Destabilize(RandomDelay, mDifficulty.MaxDriftTime);
     }
 
-    void RemoveFromDriftingList(ControlPoint ToStableCP)
-    {
-        if (mDriftingCP.Contains(ToStableCP))
-        {
-            mDriftingCP.Remove(ToStableCP);
-            mStableCP.Add(ToStableCP);
-            
-            for(int i = 0; i < ControlPoints.Length; i++)
-            {
-                if (mDriftingCP.Count == 0 || ControlPoints[i].Influence >= mDriftingCP[0].Influence)
-                {
-                    ControlPoints[i].GetComponent<Rigidbody2D>().velocity = Vector3.zero;
-                    ControlPoints[i].GetComponent<Rigidbody2D>().angularVelocity = 0;
-                    ControlPoints[i].SetRigidBodyType(RigidbodyType2D.Kinematic);
-                }
-            }
-        }
-
-    }
-
+    #endregion
 }

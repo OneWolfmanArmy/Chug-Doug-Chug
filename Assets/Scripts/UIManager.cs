@@ -5,6 +5,8 @@ public class UIManager : MonoBehaviour, IGameLoop
 {
     #region Editor
 
+    public static int CanvasWidth = 675;
+
     public Canvas BGCanvas;
     public Canvas UICanvas;
     public Canvas FGCanvas;
@@ -25,6 +27,11 @@ public class UIManager : MonoBehaviour, IGameLoop
 
 
     #region IGameLoop
+
+    public void OnCreate()
+    {
+        ScoreText.text = "";
+    }
 
     public void OnGameBegin()
     {
@@ -82,16 +89,16 @@ public class UIManager : MonoBehaviour, IGameLoop
 
     #region Metric Methods
 
-    public void SetScoreMetrics(int Score, float Intoxication, float Cred)
+    public void SetScoreMetrics(float Score, float Intoxication, float Cred)
     {
-        ScoreText.text = Score.ToString();
+        ScoreText.text = ((int)Score).ToString();
         IntoxicationBar.ResizeFilling(Intoxication);
         CredBar.ResizeFilling(Cred);
     }
 
-    public void UpdateScoreText(int Points)
+    public void UpdateScoreText(float Score)
     {
-        ScoreText.text = (int.Parse(ScoreText.text) + Points).ToString();
+        ScoreText.text = ((int)Score).ToString();
     }
 
     public void UpdateIntoxicationBar(float Intoxication)
@@ -99,7 +106,7 @@ public class UIManager : MonoBehaviour, IGameLoop
         IntoxicationBar.ResizeFilling(Intoxication);
     }
 
-    public void UpdateStreetCredBar(float StreetCred)
+    public void UpdateCredBar(float StreetCred)
     {
         CredBar.ResizeFilling(StreetCred);
     }

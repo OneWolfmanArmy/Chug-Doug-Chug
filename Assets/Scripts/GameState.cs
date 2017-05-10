@@ -19,7 +19,8 @@ public class GameState : MonoBehaviour, IGameLoop
     private enum State {Default, MainMenu, Tutorial, Playing, Paused, InGameMenu, GameOver};
     private State mState;
     private bool bCanUpdate = false;
-    
+
+    private Tutorial mTutorial;
     private Doug mDoug;
     private UIManager mUIManager;
 
@@ -54,6 +55,12 @@ public class GameState : MonoBehaviour, IGameLoop
 
 
     #region IGameLoop
+
+    public void OnCreate()
+    {
+        mDoug.OnCreate();
+        mUIManager.OnCreate();
+    }
 
     public void OnGameBegin()
     {
@@ -103,6 +110,27 @@ public class GameState : MonoBehaviour, IGameLoop
         EnterState(State.MainMenu);
     }
 
+    IEnumerator LoadMainMenuScene()
+    {
+        SceneManager.LoadScene(MainMenuSceneName);
+
+        yield return null;
+    }
+
+    IEnumerator LoadGameScene()
+    {
+        SceneManager.LoadScene(GameSceneName);  
+        
+        yield return null;
+
+        mDoug = GameObject.Find("Game/Doug").GetComponent<Doug>();
+        mUIManager = GameObject.Find("Canvases").GetComponent<UIManager>();
+        OnCreate();
+
+        mTutorial = GameObject.Find("Tutorial").GetComponent<Tutorial>();
+        mTutorial.BeginTutorial();
+    }
+
     #endregion
 
 
@@ -119,10 +147,10 @@ public class GameState : MonoBehaviour, IGameLoop
         switch (EntryState)
         {
             case State.MainMenu:
-                SceneManager.LoadScene(MainMenuSceneName);
+                LoadMainMenuScene();
                 break;
             case State.Tutorial:
-                SceneManager.LoadScene(GameSceneName);
+                StartCoroutine(LoadGameScene());         
                 break;
             case State.Playing:
                 break;
@@ -150,8 +178,6 @@ public class GameState : MonoBehaviour, IGameLoop
             case State.MainMenu:
                 break;
             case State.Tutorial:
-                mDoug = GameObject.Find("Doug").GetComponent<Doug>();
-                mUIManager = GameObject.Find("Canvases").GetComponent<UIManager>();
                 OnGameBegin();
                 break;
             case State.Playing:
