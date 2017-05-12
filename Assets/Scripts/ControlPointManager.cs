@@ -46,10 +46,12 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
                 CP.SetCallbacks
                 (() =>
                 {
+                    Debug.LogWarning(CP.gameObject.name + " Move Callback..");
                     AddInfluence(CP);
                 },
                 () =>
                 {
+                    Debug.LogWarning(CP.gameObject.name + " Stop Callback..");
                     RemoveFromDriftingList(CP);
                 });                
             }
@@ -71,7 +73,7 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
             if (ControlPoints[i] != null)
             {
                 ControlPoints[i].OnGameBegin();
-                if (ControlPoints[i].Draggable)
+                if (ControlPoints[i].AlwaysDraggable)
                 {
                     mStableCP.Remove(ControlPoints[i]);
                 }
@@ -197,6 +199,8 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
 
         float RandomDelay = Random.Range(mDifficulty.MinDriftDelay, mDifficulty.MaxDriftDelay);
         ToDriftCP.Destabilize(RandomDelay, mDifficulty.MaxDriftTime);
+
+       // AddInfluence(ToDriftCP);
     }
 
     #endregion

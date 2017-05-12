@@ -8,7 +8,7 @@ public class ControlPoint : MonoBehaviour, IGameLoop
 
     public SpriteRenderer MySprite;
     public Collider2D DragCollider;
-    public bool Draggable;
+    public bool AlwaysDraggable;
     public float Influence;
     public float StartRotation;
     public float MinDriftSpeed;
@@ -32,8 +32,8 @@ public class ControlPoint : MonoBehaviour, IGameLoop
     private bool bDragging;
     private float mDragDistance;
 
-    private System.Action mSelectCallback;
-    private System.Action mReleaseCallback;
+    private System.Action mMoveCallback;
+    private System.Action mStopCallback;
 
     #endregion
 
@@ -74,7 +74,7 @@ public class ControlPoint : MonoBehaviour, IGameLoop
         OriginalPos = transform.localPosition;
         OriginalRot = Quaternion.Euler(StartRotation * Vector3.forward);
         
-        DragCollider.enabled = Draggable;     
+        DragCollider.enabled = AlwaysDraggable;     
     }
 
     public void OnGameBegin()
@@ -97,8 +97,8 @@ public class ControlPoint : MonoBehaviour, IGameLoop
     
     public void SetCallbacks(System.Action Select, System.Action Release)
     {
-        mSelectCallback = Select;
-        mReleaseCallback = Release;
+        mMoveCallback = Select;
+        mStopCallback = Release;
     }
 
     public void Destabilize(float Delay, float MaxTime)
@@ -131,7 +131,7 @@ public class ControlPoint : MonoBehaviour, IGameLoop
             mRigidbody2D.bodyType = RigidbodyType2D.Kinematic;
             mRigidbody2D.velocity = Vector2.zero;
             mRigidbody2D.angularVelocity = 0;
-            DisableDragCollider();
+            DisableDragging();
         }
     }
 
@@ -140,7 +140,7 @@ public class ControlPoint : MonoBehaviour, IGameLoop
 
     #region Private Class Methods
 
-    private void EnableDragCollider()
+    private void EnableDragging()
     {
         if (DragCollider != null)
         {
@@ -148,9 +148,9 @@ public class ControlPoint : MonoBehaviour, IGameLoop
         }
     }
 
-    private void DisableDragCollider()
+    private void DisableDragging()
     {
-        if (DragCollider != null && !Draggable)
+        if (DragCollider != null && !AlwaysDraggable)
         {
             DragCollider.enabled = false;
         }
@@ -166,70 +166,89 @@ public class ControlPoint : MonoBehaviour, IGameLoop
 
     private void OnDriftEnter()
     {
-        bDrifting = true;
-        mRigidbody2D.bodyType = RigidbodyType2D.Dynamic;
-        mRigidbody2D.velocity = Vector2.down * Random.Range(MinDriftSpeed, MaxDriftSpeed);
-        
-        if (Mathf.Abs(mRigidbody2D.centerOfMass.x) <= .05f)
-        {
-            mRigidbody2D.angularVelocity = 20.0f * Mathf.Pow(-1, Random.Range(0, 2));
-        }
+        Debug.LogWarning(gameObject.name + " Entering Drift...");
 
+        //Physics
+        EnableDragging();
+        mRigidbody2D.bodyType = RigidbodyType2D.Dynamic;
+        float RandomDriftSpeed = Random.Range(MinDriftSpeed, MaxDriftSpeed);
+        mRigidbody2D.velocity = Vector2.down * RandomDriftSpeed;        
+        if (Mathf.Abs(mRigidbody2D.centerOfMass.x) <= Mathf.Epsilon)
+        { mRigidbody2D.angularVelocity = RandomDriftSpeed * Mathf.Pow(-1, Random.Range(0, 2)); }
+
+        //Visual FX
         SetSpriteColor(Color.red);
 
-        EnableDragCollider();
+        //Notify ControlPointManager
+        if (mMoveCallback != null) { mMoveCallback(); }
 
-        if (mSelectCallback != null)
-        {
-            mSelectCallback();
-        }
+        bDrifting = true;
     }
 
     private void OnDriftExit()
     {
-        if (bDrifting)
-        {
-            bDrifting = false;
+        Debug.LogWarning(gameObject.name + " Exiting Drift...");
+
+        //Drift Timeout
+        if (!bDragging) 
+        { 
+            //Visual FX
             SetSpriteColor(Color.white);
+
+            //Notify ControlPointManager
+            if (mStopCallback != null) { mStopCallback(); }
         }
+
+        bDrifting = false;
     }
 
     private void OnDragEnter()
     {
-        bDragging = true;
-        if (Draggable)
+        Debug.LogWarning(gameObject.name + " Entering Drag...");   
+        
+        if (AlwaysDraggable)
         {
+            //Physics
             mRigidbody2D.bodyType = RigidbodyType2D.Dynamic;
 
-            if (mSelectCallback != null)
-            {
-                mSelectCallback();
-            }
+            //Notify ControlPointManager
+            if (mMoveCallback != null) { mMoveCallback(); }
         }
         else
         {
-            OnDriftExit();
+            
         }
         
+        //Visual FX
         SetSpriteColor(Color.blue);
+
+        bDragging = true;
+
+        OnDriftExit();
     }
 
     private void OnDragExit()
     {
-        bDragging = false;
-        mDragDistance = 0;
-        SetSpriteColor(Color.white);       
-        DisableDragCollider();
+        Debug.LogWarning(gameObject.name + " Exiting Drag...");
 
-        if (mReleaseCallback != null)
-        {
-            mReleaseCallback();
-        }
+        mDragDistance = 0;   
+        
+        //Physics
+        DisableDragging();
+
+        //Visual FX
+        SetSpriteColor(Color.white);
+
+        //Notify ControlPointManager
+        if (mStopCallback != null) { mStopCallback(); }
+
+        bDragging = false;
     }
 
     private void OnSelect()
     {
-        if (bDrifting || Draggable)
+        //Player can only move Drifting ControlPoints and RightHand
+        if (bDrifting || AlwaysDraggable)
         {
             OnDragEnter();            
         }
@@ -268,7 +287,7 @@ public class ControlPoint : MonoBehaviour, IGameLoop
         bDragging = false;
 
         Immobilize();     
-        DisableDragCollider();
+        DisableDragging();
         SetSpriteColor(Color.white);
     }
 

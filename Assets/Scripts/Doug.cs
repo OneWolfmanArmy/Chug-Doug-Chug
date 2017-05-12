@@ -62,7 +62,6 @@ public class Doug : MonoBehaviour, IGameLoop
     {
         if(mDifficultyLevel < (Difficulties.Length - 1) && CanIncreaseDifficulty())
         {
-            Debug.Log("Increased");
             IncreaseDifficulty();
         }
 
