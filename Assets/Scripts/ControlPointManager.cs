@@ -46,12 +46,12 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
                 CP.SetCallbacks
                 (() =>
                 {
-                    Debug.LogWarning(CP.gameObject.name + " Move Callback..");
+                    Debug.LogWarning("Move Callback... " + CP.gameObject.name);
                     AddInfluence(CP);
                 },
                 () =>
                 {
-                    Debug.LogWarning(CP.gameObject.name + " Stop Callback..");
+                    Debug.LogWarning("Stop Callback... " + CP.gameObject.name);
                     RemoveFromDriftingList(CP);
                 });                
             }

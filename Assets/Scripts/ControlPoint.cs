@@ -164,9 +164,19 @@ public class ControlPoint : MonoBehaviour, IGameLoop
         }
     }
 
+    private void OnSelect()
+    {
+        //Player can only move Drifting ControlPoints and RightHand
+        if (bDrifting || AlwaysDraggable)
+        {
+            OnDriftExit();
+            OnDragEnter();
+        }
+    }
+
     private void OnDriftEnter()
     {
-        Debug.LogWarning(gameObject.name + " Entering Drift...");
+        Debug.LogWarning("Entering Drift... " + gameObject.name);
 
         //Physics
         EnableDragging();
@@ -187,24 +197,29 @@ public class ControlPoint : MonoBehaviour, IGameLoop
 
     private void OnDriftExit()
     {
-        Debug.LogWarning(gameObject.name + " Exiting Drift...");
+        if(bDragging)
+        {
+            return;
+        }
+
+        Debug.LogWarning("Exiting Drift... " + gameObject.name);
 
         //Drift Timeout
-        if (!bDragging) 
-        { 
+       // if (!bDragging) 
+       // { 
             //Visual FX
             SetSpriteColor(Color.white);
 
             //Notify ControlPointManager
             if (mStopCallback != null) { mStopCallback(); }
-        }
+      //  }
 
         bDrifting = false;
     }
 
     private void OnDragEnter()
     {
-        Debug.LogWarning(gameObject.name + " Entering Drag...");   
+        Debug.LogWarning("Entering Drag... " + gameObject.name);   
         
         if (AlwaysDraggable)
         {
@@ -214,22 +229,16 @@ public class ControlPoint : MonoBehaviour, IGameLoop
             //Notify ControlPointManager
             if (mMoveCallback != null) { mMoveCallback(); }
         }
-        else
-        {
-            
-        }
-        
+                
         //Visual FX
         SetSpriteColor(Color.blue);
 
         bDragging = true;
-
-        OnDriftExit();
     }
 
     private void OnDragExit()
     {
-        Debug.LogWarning(gameObject.name + " Exiting Drag...");
+        Debug.LogWarning(" Exiting Drag... " + gameObject.name);
 
         mDragDistance = 0;   
         
@@ -245,14 +254,6 @@ public class ControlPoint : MonoBehaviour, IGameLoop
         bDragging = false;
     }
 
-    private void OnSelect()
-    {
-        //Player can only move Drifting ControlPoints and RightHand
-        if (bDrifting || AlwaysDraggable)
-        {
-            OnDragEnter();            
-        }
-    }
 
     private void OnMouseMove()
     {
