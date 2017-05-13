@@ -1,11 +1,11 @@
-﻿using System.Collections;
-using UnityEngine;
-using UnityEngine.EventSystems;
+﻿using UnityEngine;
+using UnityEngine.UI;
 
 public class ControlPoint : MonoBehaviour, IGameLoop
 {
     #region Editor
 
+    public bool ShowVisualDebug;
     public SpriteRenderer MySprite;
     public Collider2D DragCollider;
     public bool AlwaysDraggable;
@@ -21,6 +21,8 @@ public class ControlPoint : MonoBehaviour, IGameLoop
 
 
     #region Properties
+
+    private TextMesh mDebugText;
 
     private Rigidbody2D mRigidbody2D;
 
@@ -68,6 +70,14 @@ public class ControlPoint : MonoBehaviour, IGameLoop
 
     public void OnCreate()
     {
+        if(ShowVisualDebug)
+        {
+            mDebugText = ((GameObject)Instantiate(GameState.Instance.VisualDebugPrefab)).GetComponent<TextMesh>();
+            mDebugText.transform.SetParent(transform, false);
+            mDebugText.transform.position = MySprite.bounds.center - Vector3.forward;
+            mDebugText.text = "";
+        }
+
         mRigidbody2D = GetComponent<Rigidbody2D>();
         mRigidbody2D.bodyType = RigidbodyType2D.Kinematic;
 
@@ -169,13 +179,14 @@ public class ControlPoint : MonoBehaviour, IGameLoop
         //Player can only move Drifting ControlPoints and RightHand
         if (bDrifting || AlwaysDraggable)
         {
-            OnDriftExit();
             OnDragEnter();
+            OnDriftExit();
         }
     }
 
     private void OnDriftEnter()
     {
+        GameState.Instance.DisplayVisualDebug(mDebugText, "ENTER DRIFT", Color.yellow, 2.0f);
         Debug.LogWarning("Entering Drift... " + gameObject.name);
 
         //Physics
@@ -197,28 +208,30 @@ public class ControlPoint : MonoBehaviour, IGameLoop
 
     private void OnDriftExit()
     {
-        if(bDragging)
+        if(!bDrifting)
         {
             return;
         }
 
+        GameState.Instance.DisplayVisualDebug(mDebugText, "EXIT DRIFT", Color.black , 2.0f);
         Debug.LogWarning("Exiting Drift... " + gameObject.name);
 
         //Drift Timeout
-       // if (!bDragging) 
-       // { 
+        if (!bDragging) 
+        { 
             //Visual FX
             SetSpriteColor(Color.white);
 
             //Notify ControlPointManager
             if (mStopCallback != null) { mStopCallback(); }
-      //  }
+        }
 
         bDrifting = false;
     }
 
     private void OnDragEnter()
     {
+        GameState.Instance.DisplayVisualDebug(mDebugText, "ENTER DRAG", Color.green, 2.0f);
         Debug.LogWarning("Entering Drag... " + gameObject.name);   
         
         if (AlwaysDraggable)
@@ -238,6 +251,7 @@ public class ControlPoint : MonoBehaviour, IGameLoop
 
     private void OnDragExit()
     {
+        GameState.Instance.DisplayVisualDebug(mDebugText, "EXIT DRAG", Color.black, 2.0f);
         Debug.LogWarning(" Exiting Drag... " + gameObject.name);
 
         mDragDistance = 0;   

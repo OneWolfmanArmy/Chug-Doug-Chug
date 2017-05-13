@@ -7,7 +7,9 @@ public class GameState : MonoBehaviour, IGameLoop
     public static GameState Instance = null;
 
     #region Editor
-    
+
+    public GameObject VisualDebugPrefab;
+
     #endregion
 
 
@@ -77,6 +79,20 @@ public class GameState : MonoBehaviour, IGameLoop
 
 
     #region Public Methods
+
+    public void DisplayVisualDebug(TextMesh DebugTextMesh, string DebugText, Color TextColor, float Duration)
+    {
+        DebugTextMesh.text = DebugText;
+        DebugTextMesh.color = TextColor;
+        //StartCoroutine(HideVisualDebug(DebugTextMesh, Duration));
+    }
+
+    IEnumerator HideVisualDebug(TextMesh DebugTextMesh, float DisplayDuration)
+    {
+        yield return new WaitForSeconds(DisplayDuration);
+
+        DebugTextMesh.text = "";
+    }
 
     public void Pause()
     {

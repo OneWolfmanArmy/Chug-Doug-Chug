@@ -5,7 +5,7 @@ using UnityEngine;
 public class Doug : MonoBehaviour, IGameLoop
 {
     #region Editor
-
+    
     [System.Serializable]
     public struct Difficulty
     {

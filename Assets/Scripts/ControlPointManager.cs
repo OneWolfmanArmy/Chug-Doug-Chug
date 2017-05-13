@@ -6,6 +6,7 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
 {
     #region Editor
 
+    public bool ShowVisualDebug;
     public ControlPoint[] ControlPoints;
     public ControlPoint DebugCP;
 
@@ -42,6 +43,10 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
             if (ControlPoints[i] != null)
             {
                 ControlPoint CP = ControlPoints[i];
+                if(ShowVisualDebug)
+                {
+                    CP.ShowVisualDebug = true;
+                }
                 CP.OnCreate();
                 CP.SetCallbacks
                 (() =>
