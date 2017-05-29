@@ -15,6 +15,8 @@ public class GameState : MonoBehaviour, IGameLoop
 
     #region Properties
 
+    //private Singleton mSingleton;
+
     private const string MainMenuSceneName = "Scn_MainMenu";
     private const string GameSceneName = "Scn_Game";
 
@@ -23,6 +25,7 @@ public class GameState : MonoBehaviour, IGameLoop
     private bool bCanUpdate = false;
 
     private Tutorial mTutorial;
+    private GameLoopManager mGame;
     private Doug mDoug;
     private UIManager mUIManager;
 
@@ -33,11 +36,11 @@ public class GameState : MonoBehaviour, IGameLoop
 
     void Awake()
     {
-        if(Instance == null)
+        if (Instance == null)
         {
             Instance = this;
         }
-        else if(Instance != this)
+        else if (Instance != this)
         {
             Destroy(gameObject);
         }
@@ -60,19 +63,22 @@ public class GameState : MonoBehaviour, IGameLoop
 
     public void OnCreate()
     {
-        mDoug.OnCreate();
+        //mDoug.OnCreate();
+        mGame.OnCreate();
         mUIManager.OnCreate();
     }
 
     public void OnGameBegin()
     {
-        mDoug.OnGameBegin();
+        // mDoug.OnGameBegin();
+        mGame.OnGameBegin();
         mUIManager.OnGameBegin();
     }
 
     public void OnFrame()
     {
-        mDoug.OnFrame();
+        //mDoug.OnFrame();
+        mGame.OnFrame();
     }
 
     #endregion
@@ -84,7 +90,7 @@ public class GameState : MonoBehaviour, IGameLoop
     {
         DebugTextMesh.text = DebugText;
         DebugTextMesh.color = TextColor;
-        //StartCoroutine(HideVisualDebug(DebugTextMesh, Duration));
+        StartCoroutine(HideVisualDebug(DebugTextMesh, Duration));
     }
 
     IEnumerator HideVisualDebug(TextMesh DebugTextMesh, float DisplayDuration)
@@ -139,11 +145,11 @@ public class GameState : MonoBehaviour, IGameLoop
         
         yield return null;
 
-        mDoug = GameObject.Find("Game/Doug").GetComponent<Doug>();
+        mGame = GameObject.Find("Game").GetComponent<GameLoopManager>();
         mUIManager = GameObject.Find("Canvases").GetComponent<UIManager>();
         OnCreate();
 
-        mTutorial = GameObject.Find("Tutorial").GetComponent<Tutorial>();
+        mTutorial = GameObject.Find("Canvases/Canvas_UI/Tutorial").GetComponent<Tutorial>();
         mTutorial.BeginTutorial();
     }
 
@@ -156,6 +162,7 @@ public class GameState : MonoBehaviour, IGameLoop
     {
         //Disable OnStateUpdate while transitioning states
         bCanUpdate = false;
+
         //Exit state before entering new one
         ExitCurrentState();
 

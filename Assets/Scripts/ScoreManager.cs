@@ -26,12 +26,8 @@ public class ScoreManager : MonoBehaviour, IGameLoop
 
     private const float FATAL_INTOXICATION = 1.0f;
     private const float FATAL_CRED = 0.0f;
-
-    private struct ScoreDifficulty
-    {
-        public int ScoreRequisite;
-    }
-    private ScoreDifficulty mDifficulty;
+    
+    private Difficulty.Score mDifficulty;
 
     private float mScore;
     private float mIntoxication;
@@ -71,14 +67,14 @@ public class ScoreManager : MonoBehaviour, IGameLoop
 
     #region Public Methods
 
-    public void SetDifficulty(Doug.Difficulty Difficulty)
+    public void SetDifficulty(Difficulty.Score Difficulty)
     {
-        mDifficulty.ScoreRequisite = Difficulty.ScoreRequisite;
+        mDifficulty.Target = Difficulty.Target;
     }
 
     public bool CanIncreaseDifficulty()
     {
-        return mScore >= mDifficulty.ScoreRequisite;
+        return mScore >= mDifficulty.Target;
     }
 
     public void IncrementScore(float Points)

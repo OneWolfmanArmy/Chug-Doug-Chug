@@ -1,26 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Doug : MonoBehaviour, IGameLoop
 {
     #region Editor
     
-    [System.Serializable]
-    public struct Difficulty
-    {
-        public int ScoreRequisite;
-
-        public int MaxDriftCount;
-        public float MinDriftDelay;
-        public float MaxDriftDelay;
-        public float MaxDriftTime;
-    }
-    public Difficulty[] Difficulties;
-
-    public float InitialDelay;
-
-    public ScoreManager ScoreBoard;
     public ControlPointManager CPManager;
 
     public Transform BeerSrc;
@@ -33,9 +16,6 @@ public class Doug : MonoBehaviour, IGameLoop
 
     #region Properties
 
-    private bool bDrinking;
-    private int mDifficultyLevel;
-
     #endregion
 
 
@@ -44,40 +24,17 @@ public class Doug : MonoBehaviour, IGameLoop
     public void OnCreate()
     {
         MinDrinkingDistance *= MinDrinkingDistance;
-
-        ScoreBoard.OnCreate();
+        
         CPManager.OnCreate();
     }
 
     public void OnGameBegin()
     {
-        mDifficultyLevel = 0;
-        ScoreBoard.SetDifficulty(Difficulties[mDifficultyLevel]);
-
-        ScoreBoard.OnGameBegin();
         CPManager.OnGameBegin();
     }    
 
     public void OnFrame()
-    {
-        if(mDifficultyLevel < (Difficulties.Length - 1) && CanIncreaseDifficulty())
-        {
-            IncreaseDifficulty();
-        }
-
-        if(DrinkingDistance())
-        {
-            ScoreBoard.IncrementIntoxication();
-            ScoreBoard.IncrementCred();
-            ScoreBoard.IncrementScore(ScoreBoard.DrinkScoreMultiplier);
-        }
-        else
-        {
-            ScoreBoard.DecrementIntoxication();
-            ScoreBoard.DecrementCred();
-        }
-
-        ScoreBoard.OnFrame();
+    {        
         CPManager.OnFrame();
     }
 
@@ -85,6 +42,11 @@ public class Doug : MonoBehaviour, IGameLoop
 
 
     #region Public Methods
+
+    public void SetDifficulty(Difficulty.ControlPoint Difficulty)
+    {
+        CPManager.SetDifficulty(Difficulty);
+    }
 
     public bool DrinkingDistance()
     {
@@ -96,19 +58,5 @@ public class Doug : MonoBehaviour, IGameLoop
 
     #region Private Methods
 
-    private bool CanIncreaseDifficulty()
-    {
-        return ScoreBoard.CanIncreaseDifficulty();
-    }
-
-    private void IncreaseDifficulty()
-    {
-        mDifficultyLevel++;
-        Difficulty CurrentDifficulty = Difficulties[mDifficultyLevel];
-        ScoreBoard.SetDifficulty(CurrentDifficulty);
-        CPManager.SetDifficulty(CurrentDifficulty);
-    }
-
     #endregion
-
 }

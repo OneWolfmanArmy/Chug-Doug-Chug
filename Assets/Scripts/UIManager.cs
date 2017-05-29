@@ -3,6 +3,13 @@ using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour, IGameLoop
 {
+    #region Static Accessors
+
+    public static float WIDTH;
+    public static float HEIGHT;
+
+    #endregion
+
     #region Editor
 
     public static int CanvasWidth = 675;
@@ -30,6 +37,8 @@ public class UIManager : MonoBehaviour, IGameLoop
 
     public void OnCreate()
     {
+        WIDTH = UICanvas.pixelRect.width;
+        WIDTH = UICanvas.pixelRect.height;
         ScoreText.text = "";
     }
 

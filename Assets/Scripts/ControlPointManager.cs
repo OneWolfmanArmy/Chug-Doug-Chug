@@ -15,14 +15,14 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
 
     #region Properties
 
-    private struct CPDifficulty
-    {
-        public int MaxDriftCount;
-        public float MinDriftDelay;
-        public float MaxDriftDelay;
-        public float MaxDriftTime;
-    }
-    private CPDifficulty mDifficulty;
+    //private struct CPDifficulty
+    //{
+    //    public int MaxDriftCount;
+    //    public float MinDriftDelay;
+    //    public float MaxDriftDelay;
+    //    public float MaxDriftTime;
+    //}
+    private Difficulty.ControlPoint mDifficulty;
 
     private List<ControlPoint> mStableCP;
     private List<ControlPoint> mDriftingCP;
@@ -106,12 +106,13 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
 
     #region Public Methods
 
-    public void SetDifficulty(Doug.Difficulty Difficulty)
+    public void SetDifficulty(Difficulty.ControlPoint Difficulty)
     {
-        mDifficulty.MaxDriftCount = Difficulty.MaxDriftCount;
-        mDifficulty.MinDriftDelay = Difficulty.MinDriftDelay;
-        mDifficulty.MaxDriftDelay = Difficulty.MaxDriftDelay;
-        mDifficulty.MaxDriftTime = Difficulty.MaxDriftTime;
+        mDifficulty = Difficulty;
+        //mDifficulty.MaxDriftCount = Difficulty.MaxDriftCount;
+        //mDifficulty.MinDriftDelay = Difficulty.MinDriftDelay;
+        //mDifficulty.MaxDriftDelay = Difficulty.MaxDriftDelay;
+        //mDifficulty.MaxDriftTime = Difficulty.MaxDriftTime;
     }
 
     #endregion

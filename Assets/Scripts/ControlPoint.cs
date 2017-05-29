@@ -30,7 +30,6 @@ public class ControlPoint : MonoBehaviour, IGameLoop
     private Quaternion OriginalRot;
     
     private bool bDrifting;
-    private float mDriftTime;
     private bool bDragging;
     private float mDragDistance;
 
@@ -94,10 +93,6 @@ public class ControlPoint : MonoBehaviour, IGameLoop
 
     public void OnFrame()
     {
-        if(bDrifting)
-        {
-            mDriftTime += Time.deltaTime;
-        }
     }
 
     #endregion
@@ -141,7 +136,7 @@ public class ControlPoint : MonoBehaviour, IGameLoop
             mRigidbody2D.bodyType = RigidbodyType2D.Kinematic;
             mRigidbody2D.velocity = Vector2.zero;
             mRigidbody2D.angularVelocity = 0;
-            DisableDragging();
+           // DisableDragging();
         }
     }
 
@@ -188,14 +183,16 @@ public class ControlPoint : MonoBehaviour, IGameLoop
     {
         GameState.Instance.DisplayVisualDebug(mDebugText, "ENTER DRIFT", Color.yellow, 2.0f);
         Debug.LogWarning("Entering Drift... " + gameObject.name);
-
+        
         //Physics
         EnableDragging();
         mRigidbody2D.bodyType = RigidbodyType2D.Dynamic;
         float RandomDriftSpeed = Random.Range(MinDriftSpeed, MaxDriftSpeed);
         mRigidbody2D.velocity = Vector2.down * RandomDriftSpeed;        
         if (Mathf.Abs(mRigidbody2D.centerOfMass.x) <= Mathf.Epsilon)
-        { mRigidbody2D.angularVelocity = RandomDriftSpeed * Mathf.Pow(-1, Random.Range(0, 2)); }
+        {
+            mRigidbody2D.angularVelocity = RandomDriftSpeed * Mathf.Pow(-1, Random.Range(0, 2));
+        }
 
         //Visual FX
         SetSpriteColor(Color.red);
