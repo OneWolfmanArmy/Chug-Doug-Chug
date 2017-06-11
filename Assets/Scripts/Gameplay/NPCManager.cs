@@ -29,11 +29,13 @@ public class NPCManager : MonoBehaviour, IGameLoop
 
 
     #region Properties
-    
+
     private DifficultyLevel.NPC mDifficulty;
+    public DifficultyLevel.NPC Difficulty { set { mDifficulty = value; } }
     private float mSpawnChanceSum;
     private List<Spectator> mSpectators;
     private Vector3 mFrustumGradient;
+    public float SpectatorCredSum { get { return mSpectatorCredSum; } }
     private float mSpectatorCredSum;
 
     SpectatorGrid mSpectatorGrid;
@@ -58,11 +60,11 @@ public class NPCManager : MonoBehaviour, IGameLoop
 
     public void OnGameBegin()
     {
-        Spectator[] OldSpectators = GetComponentsInChildren<Spectator>();
-        for(int i = 0; i < OldSpectators.Length; i++)
+        for (int i = 0; i < mSpectators.Count; i++)
         {
-            Destroy(OldSpectators[i].gameObject);
+            Destroy(mSpectators[i].gameObject);
         }
+        mSpectators.Clear();
 
         InitialSpawn();
 
@@ -102,11 +104,6 @@ public class NPCManager : MonoBehaviour, IGameLoop
 
 
     #region Public Methods
-    
-    public void SetDifficulty(DifficultyLevel.NPC Difficulty)
-    {
-        mDifficulty.MaxSpectators = Difficulty.MaxSpectators;
-    }
 
     #endregion
 
@@ -255,13 +252,13 @@ public class NPCManager : MonoBehaviour, IGameLoop
     private void OnSpectatorBeginWatching(Spectator S)
     {
         mSpectatorCredSum += S.CredValue;
-        UIManager.Instance.CredMultiplier.text = mSpectatorCredSum.ToString();
+        UIManager.Instance.UpdateCredMultiplier(mSpectatorCredSum);
     }
 
     private void OnSpectatorDistracted(Spectator S)
     {
         mSpectatorCredSum -= S.CredValue;
-        UIManager.Instance.CredMultiplier.text = mSpectatorCredSum.ToString();
+        UIManager.Instance.UpdateCredMultiplier(mSpectatorCredSum);
     }
 
     #endregion

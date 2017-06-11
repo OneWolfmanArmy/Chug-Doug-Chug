@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using DG.Tweening;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class UIManager : Singleton<UIManager>, IGameLoop
@@ -26,7 +27,7 @@ public class UIManager : Singleton<UIManager>, IGameLoop
 
     public ProgressBar IntoxicationBar;
     public ProgressBar CredBar;
-    public Text CredMultiplier;
+    public TweenText CredMultiplier;
 
     public Button PauseButton;
     public Button ExitButton;
@@ -133,12 +134,8 @@ public class UIManager : Singleton<UIManager>, IGameLoop
 
     public void UpdateCredMultiplier(float Multiplier)
     {
-        CredMultiplier.text = Multiplier.ToString();
-    }
-
-    public int GetCredMultiplier()
-    {
-        return System.Int32.Parse(CredMultiplier.text);
+        CredMultiplier.SetText(Multiplier.ToString());
+        CredMultiplier.DOPunchScale();
     }
 
     #endregion

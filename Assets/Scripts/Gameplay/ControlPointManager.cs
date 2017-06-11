@@ -15,6 +15,7 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
 
     #region Properties
     
+    public DifficultyLevel.ControlPoint Difficulty { set { mDifficulty = value; } }
     private DifficultyLevel.ControlPoint mDifficulty;
 
     private List<ControlPoint> mStableCP;
@@ -141,7 +142,14 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
             ControlPoint Next = CP.Children[i];
             if (Next.IsMobile())
             {
-                RemoveInfluence(Next);
+                if (!Next.IsDrifting)
+                {
+                    RemoveInfluence(Next);
+                }
+                else if(!CP.AlwaysDraggable)
+                {
+                    AddInfluence(Next);
+                }
             }
         }
     }

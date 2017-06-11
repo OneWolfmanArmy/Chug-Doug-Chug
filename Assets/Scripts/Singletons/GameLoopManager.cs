@@ -50,18 +50,17 @@ public class GameLoopManager : Singleton<GameLoopManager>, IGameLoop
         if (DougController.DrinkingDistance())
         {
             ScoreController.IncrementIntoxication();
-            ScoreController.IncrementCred();
+            ScoreController.IncrementCred(NPCController.SpectatorCredSum);
             ScoreController.IncrementScore(ScoreController.DrinkScoreMultiplier);
         }
         else
         {
             ScoreController.DecrementIntoxication();
-            ScoreController.DecrementCred();
+            ScoreController.DecrementCred(NPCController.SpectatorCredSum);
         }
+
         ScoreController.OnFrame();
-
         DougController.OnFrame();
-
         NPCController.OnFrame();
     }
 
@@ -86,9 +85,9 @@ public class GameLoopManager : Singleton<GameLoopManager>, IGameLoop
     {
         mDifficultyLevel = Level;
         DifficultyLevel CurrentDifficulty = Difficulties[mDifficultyLevel];
-        ScoreController.SetDifficulty(CurrentDifficulty.ScoreDifficulty);
-        DougController.SetDifficulty(CurrentDifficulty.CPDifficulty);
-        NPCController.SetDifficulty(CurrentDifficulty.NPCDifficulty);
+        ScoreController.Difficulty = CurrentDifficulty.ScoreDifficulty;
+        DougController.SetControlPointDifficulty(CurrentDifficulty.CPDifficulty);
+        NPCController.Difficulty = CurrentDifficulty.NPCDifficulty;
     }
 
     private void IncreaseDifficulty()

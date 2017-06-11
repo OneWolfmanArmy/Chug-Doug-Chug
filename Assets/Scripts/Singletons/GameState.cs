@@ -30,7 +30,7 @@ public class GameState : Singleton<GameState>, IGameLoop
 
     #region MonoBehaviour
 
-    void Awake()
+    new void Awake()
     {
         base.Awake();
         DontDestroyOnLoad(gameObject);

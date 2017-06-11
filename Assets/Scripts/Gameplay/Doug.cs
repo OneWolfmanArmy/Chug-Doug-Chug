@@ -43,9 +43,9 @@ public class Doug : MonoBehaviour, IGameLoop
 
     #region Public Methods
 
-    public void SetDifficulty(DifficultyLevel.ControlPoint Difficulty)
+    public void SetControlPointDifficulty(DifficultyLevel.ControlPoint Difficulty)
     {
-        CPManager.SetDifficulty(Difficulty);
+        CPManager.Difficulty = Difficulty;
     }
 
     public bool DrinkingDistance()

@@ -27,8 +27,10 @@ public class ControlPoint : MonoBehaviour, IGameLoop
 
     private Vector3 OriginalPos;
     private Quaternion OriginalRot;
-    
+
+    public bool IsDrifting { get { return bDrifting; } }
     private bool bDrifting;
+    public bool IsDragging { get { return bDragging; } }
     private bool bDragging;
     private float mDragDistance;
 
@@ -277,9 +279,9 @@ public class ControlPoint : MonoBehaviour, IGameLoop
     {
         if(bDragging)
         {
-            float DeltaX = Input.GetAxis("Mouse X") * UIManager.WIDTH;
-            float DeltaY = Input.GetAxis("Mouse Y") * UIManager.HEIGHT;
-            Vector2 Delta = new Vector2(DeltaX, DeltaY) / Screen.width;
+            float DeltaX = Input.GetAxis("Mouse X");// * UIManager.WIDTH;
+            float DeltaY = Input.GetAxis("Mouse Y");// * UIManager.HEIGHT;
+            Vector2 Delta = new Vector2(DeltaX, DeltaY);// / Screen.width;
             mDragDistance += Delta.magnitude;
 
             mRigidbody2D.velocity = Delta * DragSpeed;

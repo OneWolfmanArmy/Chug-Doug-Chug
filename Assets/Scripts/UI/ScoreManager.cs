@@ -24,7 +24,8 @@ public class ScoreManager : MonoBehaviour, IGameLoop
 
     private const float FATAL_INTOXICATION = 1.0f;
     private const float FATAL_CRED = 0.0f;
-    
+
+    public DifficultyLevel.Score Difficulty { set { mDifficulty = value; } }
     private DifficultyLevel.Score mDifficulty;
 
     private float mScore;
@@ -65,11 +66,6 @@ public class ScoreManager : MonoBehaviour, IGameLoop
 
     #region Public Methods
 
-    public void SetDifficulty(DifficultyLevel.Score Difficulty)
-    {
-        mDifficulty.Target = Difficulty.Target;
-    }
-
     public bool CanIncreaseDifficulty()
     {
         return mScore >= mDifficulty.Target;
@@ -90,9 +86,9 @@ public class ScoreManager : MonoBehaviour, IGameLoop
         }
     }
 
-    public void IncrementCred()
+    public void IncrementCred(float Multiplier)
     {
-        mCred = Mathf.Min(1.0f, mCred + CredGainRate * UIManager.Instance.GetCredMultiplier() * Time.deltaTime);
+        mCred = Mathf.Min(1.0f, mCred + CredGainRate * Multiplier * Time.deltaTime);
     }
 
     public void DecrementIntoxication()
@@ -100,9 +96,9 @@ public class ScoreManager : MonoBehaviour, IGameLoop
         mIntoxication = Mathf.Max(0, mIntoxication - SoberRate * Time.deltaTime);
     }
 
-    public void DecrementCred()
+    public void DecrementCred(float Multiplier)
     {
-        mCred -= CredLossRate * UIManager.Instance.GetCredMultiplier() * Time.deltaTime;
+        mCred -= CredLossRate * Multiplier * Time.deltaTime;
         if(mCred <= FATAL_CRED)
         {
             mCred = FATAL_CRED;
