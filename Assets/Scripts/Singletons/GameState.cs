@@ -180,6 +180,7 @@ public class GameState : Singleton<GameState>, IGameLoop
                 StartCoroutine(LoadGameScene());
                 break;
             case State.Playing:
+               // AudioManager.Instance.PlayMusic("GameMusic");
                 break;
             case State.Paused:
                 Time.timeScale = 0;

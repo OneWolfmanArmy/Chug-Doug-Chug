@@ -62,7 +62,6 @@ public class Tutorial : MonoBehaviour
     public void ExitTutorial()
     {
         GameState.Instance.BeginPlay();
-        //Destroy(gameObject);
     }
 
     #endregion
@@ -75,7 +74,7 @@ public class Tutorial : MonoBehaviour
        // DougScript.CPManager.AddInfluence(CP);
         StartCoroutine(WaitForStepCompletion(() => 
         {
-            return DougScript.DrinkingDistance();
+            return DougScript.IsDrinking;
         }, 
         () =>
         {

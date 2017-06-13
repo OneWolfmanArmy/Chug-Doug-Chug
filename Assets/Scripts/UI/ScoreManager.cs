@@ -17,6 +17,11 @@ public class ScoreManager : MonoBehaviour, IGameLoop
     public float CredGainRate;
     public float CredLossRate;
 
+    [Range(0, 1)]
+    public float AlarmIntoxication;
+    [Range(0, 1)]
+    public float AlarmCred;
+
     #endregion
 
 
@@ -45,7 +50,6 @@ public class ScoreManager : MonoBehaviour, IGameLoop
         mScore = 0;
         mIntoxication = InitialIntoxication;        
         mCred = InitialCred;
-
         UpdateScoreUI();
     }
 
@@ -53,6 +57,8 @@ public class ScoreManager : MonoBehaviour, IGameLoop
     {
         if (!Sandbox)
         {
+            TestWarningCondition();
+            TestLoseCondition();
             UpdateScoreUI();
         }
         else
@@ -79,11 +85,6 @@ public class ScoreManager : MonoBehaviour, IGameLoop
     public void IncrementIntoxication()
     {
         mIntoxication += IntoxicationRate * Time.deltaTime;
-        if (mIntoxication >= FATAL_INTOXICATION)
-        {
-            mIntoxication = FATAL_INTOXICATION;
-            FinalizeScore();
-        }
     }
 
     public void IncrementCred(float Multiplier)
@@ -99,11 +100,6 @@ public class ScoreManager : MonoBehaviour, IGameLoop
     public void DecrementCred(float Multiplier)
     {
         mCred -= CredLossRate * Multiplier * Time.deltaTime;
-        if(mCred <= FATAL_CRED)
-        {
-            mCred = FATAL_CRED;
-            FinalizeScore();
-        }
     }
 
     #endregion
@@ -114,6 +110,26 @@ public class ScoreManager : MonoBehaviour, IGameLoop
     private void UpdateScoreUI()
     {
         UIManager.Instance.SetScoreMetrics(mScore, mIntoxication, mCred);
+    }
+
+    private void TestWarningCondition()
+    {
+        if (mIntoxication >= FATAL_INTOXICATION || mCred <= FATAL_CRED)
+        {
+            FinalizeScore();
+        }
+    }
+
+    private void TestLoseCondition()
+    {
+        if (mIntoxication >= AlarmIntoxication || mCred <= AlarmCred)
+        {
+            AudioManager.Instance.PlaySoundEffect(gameObject, "Siren");
+        }
+        else
+        {
+            AudioManager.Instance.StopSFX(gameObject);
+        }
     }
 
     private void FinalizeScore()

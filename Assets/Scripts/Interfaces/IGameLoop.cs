@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-public interface IGameLoop
+﻿public interface IGameLoop
 {
     void OnCreate();
     void OnGameBegin();

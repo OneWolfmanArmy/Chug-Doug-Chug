@@ -10,6 +10,8 @@ public class Doug : MonoBehaviour, IGameLoop
     public Transform BeerDst;
 
     public float MinDrinkingDistance;
+    public bool IsDrinking { get { return bDrinking; } }
+    private bool bDrinking;
 
     #endregion
 
@@ -34,12 +36,27 @@ public class Doug : MonoBehaviour, IGameLoop
     }    
 
     public void OnFrame()
-    {        
+    {
+        bool Drinking = DrinkingDistance();
+        if(bDrinking ^ Drinking)
+        {
+            if (!bDrinking)
+            {
+                AudioManager.Instance.PlaySoundEffect(gameObject, "Gulp");
+            }
+            else
+            {
+                AudioManager.Instance.StopSFX(gameObject);
+            }
+        }
+
+        bDrinking = Drinking;
+          
         CPManager.OnFrame();
     }
 
     #endregion
-
+    
 
     #region Public Methods
 
@@ -48,15 +65,15 @@ public class Doug : MonoBehaviour, IGameLoop
         CPManager.Difficulty = Difficulty;
     }
 
-    public bool DrinkingDistance()
-    {
-        return Vector2.SqrMagnitude(BeerDst.position - BeerSrc.position) <= MinDrinkingDistance;
-    }
-
     #endregion
 
 
     #region Private Methods
+
+    private bool DrinkingDistance()
+    {
+        return Vector2.SqrMagnitude(BeerDst.position - BeerSrc.position) <= MinDrinkingDistance;
+    }
 
     #endregion
 }

@@ -47,7 +47,7 @@ public class GameLoopManager : Singleton<GameLoopManager>, IGameLoop
             IncreaseDifficulty();
         }
 
-        if (DougController.DrinkingDistance())
+        if (DougController.IsDrinking)
         {
             ScoreController.IncrementIntoxication();
             ScoreController.IncrementCred(NPCController.SpectatorCredSum);
