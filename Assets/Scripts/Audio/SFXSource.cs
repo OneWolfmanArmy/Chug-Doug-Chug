@@ -10,8 +10,9 @@ public class SFXSource : MonoBehaviour
     [Serializable]
     public struct SFX
     {
-        public string Name;
         public AudioClip Clip;
+        [Range(0, 1)]
+        public float Volume;
         public bool Loop;
         public float LoopDelay;
     }
@@ -34,7 +35,7 @@ public class SFXSource : MonoBehaviour
         mSFXMap = new Dictionary<string, SFX>();
         for (int i = 0; i < SoundEffects.Length; i++)
         {
-            mSFXMap.Add(SoundEffects[i].Name, SoundEffects[i]);
+            mSFXMap.Add(SoundEffects[i].Clip.name, SoundEffects[i]);
         }
     }
 
@@ -47,6 +48,7 @@ public class SFXSource : MonoBehaviour
         {
             SFX S = mSFXMap[Name];
             mSource.clip = S.Clip;
+            mSource.volume = S.Volume;
             mSource.Play();
             if (S.Loop)
             {

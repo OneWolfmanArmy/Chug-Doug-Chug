@@ -8,6 +8,7 @@ public class UIManager : Singleton<UIManager>, IGameLoop
 
     public static float WIDTH;
     public static float HEIGHT;
+    public static Vector2 UNITS_PER_PIXEL;
 
     #endregion
 
@@ -41,6 +42,7 @@ public class UIManager : Singleton<UIManager>, IGameLoop
     {
         WIDTH = UICanvas.pixelRect.width;
         HEIGHT = UICanvas.pixelRect.height;
+        UNITS_PER_PIXEL = new Vector2(WIDTH / Screen.width, HEIGHT / Screen.height);
 
         ScoreText.text = "";
 

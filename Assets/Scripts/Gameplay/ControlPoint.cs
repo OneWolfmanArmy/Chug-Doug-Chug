@@ -134,6 +134,8 @@ public class ControlPoint : MonoBehaviour, IGameLoop
     {
         if (mRigidbody2D != null)
         {
+            //SetSpriteColor(Color.white);
+           // Debug.Log(gameObject.name + " Mobilized");
             mRigidbody2D.bodyType = RigidbodyType2D.Dynamic;
         }
     }
@@ -142,6 +144,8 @@ public class ControlPoint : MonoBehaviour, IGameLoop
     {
         if (mRigidbody2D != null)
         {
+            SetSpriteColor(Color.green);
+            //Debug.Log(gameObject.name + " Immobilized");
             mRigidbody2D.bodyType = RigidbodyType2D.Kinematic;
             mRigidbody2D.velocity = Vector2.zero;
             mRigidbody2D.angularVelocity = 0;
@@ -279,9 +283,9 @@ public class ControlPoint : MonoBehaviour, IGameLoop
     {
         if(bDragging)
         {
-            float DeltaX = Input.GetAxis("Mouse X");// * UIManager.WIDTH;
-            float DeltaY = Input.GetAxis("Mouse Y");// * UIManager.HEIGHT;
-            Vector2 Delta = new Vector2(DeltaX, DeltaY);// / Screen.width;
+            float DeltaX = Input.GetAxis("Mouse X") * UIManager.UNITS_PER_PIXEL.x;
+            float DeltaY = Input.GetAxis("Mouse Y") * UIManager.UNITS_PER_PIXEL.y;
+            Vector2 Delta = new Vector2(DeltaX, DeltaY);
             mDragDistance += Delta.magnitude;
 
             mRigidbody2D.velocity = Delta * DragSpeed;
