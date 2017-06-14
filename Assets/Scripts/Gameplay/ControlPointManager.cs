@@ -148,8 +148,8 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
                 }
                 else if(CP.AlwaysDraggable)
                 {
-                    //AddInfluence(Next);
-                    CP.Mobilize();
+                    AddInfluence(CP);
+                    //CP.Mobilize();
                 }
             }
         }

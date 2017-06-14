@@ -134,7 +134,7 @@ public class ControlPoint : MonoBehaviour, IGameLoop
     {
         if (mRigidbody2D != null)
         {
-            //SetSpriteColor(Color.white);
+           // SetSpriteColor(Color.white);
            // Debug.Log(gameObject.name + " Mobilized");
             mRigidbody2D.bodyType = RigidbodyType2D.Dynamic;
         }
@@ -144,7 +144,7 @@ public class ControlPoint : MonoBehaviour, IGameLoop
     {
         if (mRigidbody2D != null)
         {
-            SetSpriteColor(Color.green);
+            //SetSpriteColor(Color.green);
             //Debug.Log(gameObject.name + " Immobilized");
             mRigidbody2D.bodyType = RigidbodyType2D.Kinematic;
             mRigidbody2D.velocity = Vector2.zero;
