@@ -9,6 +9,7 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
     public bool ShowVisualDebug;
     public ControlPoint[] ControlPoints;
     public ControlPoint DebugCP;
+    public GameObject Hose;
 
     #endregion
 
@@ -47,6 +48,7 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
                 {
                     Debug.LogWarning("Move Callback... " + CP.gameObject.name);
                     AddInfluence(CP);
+                    SetHoseGravity(CP.AlwaysDraggable ? 1 : 0);
                 },
                 () =>
                 {
@@ -147,9 +149,8 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
                     RemoveInfluence(Next);
                 }
                 else if(CP.AlwaysDraggable)
-                {
+                {  
                     AddInfluence(CP);
-                    //CP.Mobilize();
                 }
             }
         }
@@ -204,7 +205,18 @@ public class ControlPointManager : MonoBehaviour, IGameLoop
         float RandomDelay = Random.Range(mDifficulty.MinDriftDelay, mDifficulty.MaxDriftDelay);
         ToDriftCP.Destabilize(RandomDelay, mDifficulty.MaxDriftTime);
 
+        SetHoseGravity(0);
        // AddInfluence(ToDriftCP);
+    }
+
+    private void SetHoseGravity(int GravityScale)
+    {
+        Transform T = Hose.transform.GetChild(0);
+        while(T.childCount > 0)
+        {
+            T.GetComponent<Rigidbody2D>().gravityScale = GravityScale;            
+            T = T.GetChild(0);
+        }
     }
 
     #endregion
