@@ -134,8 +134,6 @@ public class ControlPoint : MonoBehaviour, IGameLoop
     {
         if (mRigidbody2D != null)
         {
-            //SetSpriteColor(Color.white);
-           // Debug.Log(gameObject.name + " Mobilized");
             mRigidbody2D.bodyType = RigidbodyType2D.Dynamic;
         }
     }
@@ -144,12 +142,9 @@ public class ControlPoint : MonoBehaviour, IGameLoop
     {
         if (mRigidbody2D != null)
         {
-            SetSpriteColor(Color.green);
-            //Debug.Log(gameObject.name + " Immobilized");
             mRigidbody2D.bodyType = RigidbodyType2D.Kinematic;
             mRigidbody2D.velocity = Vector2.zero;
             mRigidbody2D.angularVelocity = 0;
-           // DisableDragging();
         }
     }
 
@@ -202,10 +197,10 @@ public class ControlPoint : MonoBehaviour, IGameLoop
         mRigidbody2D.bodyType = RigidbodyType2D.Dynamic;
         float RandomDriftSpeed = Random.Range(MinDriftSpeed, MaxDriftSpeed);
         mRigidbody2D.velocity = Vector2.down * RandomDriftSpeed;        
-        if (Mathf.Abs(mRigidbody2D.centerOfMass.x) <= Mathf.Epsilon)
-        {
+        //if (Mathf.Abs(mRigidbody2D.centerOfMass.x) <= Mathf.Epsilon)
+        //{
             mRigidbody2D.angularVelocity = RandomDriftSpeed * Mathf.Pow(-1, Random.Range(0, 2));
-        }
+        //}
 
         //Visual FX
         SetSpriteColor(Color.red);
@@ -252,6 +247,10 @@ public class ControlPoint : MonoBehaviour, IGameLoop
             //Notify ControlPointManager
             if (mMoveCallback != null) { mMoveCallback(); }
         }
+        else
+        {
+            CancelInvoke("OnDriftExit");
+        }
                 
         //Visual FX
         SetSpriteColor(Color.blue);
@@ -264,7 +263,7 @@ public class ControlPoint : MonoBehaviour, IGameLoop
         GameState.Instance.DisplayVisualDebug(mDebugText, "EXIT DRAG", Color.black, 2.0f);
         Debug.LogWarning(" Exiting Drag... " + gameObject.name);
 
-        mDragDistance = 0;   
+        mDragDistance = 0;
         
         //Physics
         DisableDragging();
